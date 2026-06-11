@@ -108,6 +108,7 @@ export default function App() {
       saveTasks(newTasks)
       return newTasks
     })
+    setShowCapsule(false)
     setPhase('task_board')
   }
 

@@ -12,8 +12,8 @@ export async function chat(messages: { role: 'system' | 'user' | 'assistant'; co
   const response = await client.chat.completions.create({
     model: MODEL,
     messages,
-    temperature: 0.8,
-    max_tokens: 1024,
+    temperature: 0.6,
+    max_tokens: 256,
   })
   return response.choices[0]?.message?.content || ''
 }
@@ -25,8 +25,8 @@ export async function chatStream(
   const stream = await client.chat.completions.create({
     model: MODEL,
     messages,
-    temperature: 0.8,
-    max_tokens: 1024,
+    temperature: 0.6,
+    max_tokens: 256,
     stream: true,
   })
   let full = ''

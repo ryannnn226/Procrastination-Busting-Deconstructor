@@ -14,7 +14,7 @@ interface Props {
   subtasks: Subtask[]
   onConfirm: (subtasks: Subtask[]) => void
   onBack: () => void
-  onRegenerate: () => void
+  onRegenerate: () => Promise<void>
 }
 
 export function SubtaskEditor({ subtasks, onConfirm, onBack, onRegenerate }: Props) {
@@ -22,6 +22,7 @@ export function SubtaskEditor({ subtasks, onConfirm, onBack, onRegenerate }: Pro
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editDuration, setEditDuration] = useState(15)
+  const [regenerating, setRegenerating] = useState(false)
   const [showAdd, setShowAdd] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [newDifficulty, setNewDifficulty] = useState<Difficulty>('medium')
@@ -251,7 +252,7 @@ export function SubtaskEditor({ subtasks, onConfirm, onBack, onRegenerate }: Pro
         <button onClick={onBack} className="flex-1 py-3 border border-border rounded-xl text-sm hover:bg-secondary transition-colors">
           ← 返回
         </button>
-        <button onClick={onRegenerate} className="px-4 py-3 border border-border rounded-xl text-sm text-muted-foreground hover:bg-secondary transition-colors">
+        <button onClick={async () => { setRegenerating(true); await onRegenerate(); setRegenerating(false); }} disabled={regenerating} className="px-4 py-3 border border-border rounded-xl text-sm text-muted-foreground hover:bg-secondary transition-colors disabled:opacity-50">
           🔄 重新生成
         </button>
         <button
