@@ -53,7 +53,7 @@ export function SubtaskEditor({ subtasks, onConfirm, onBack, onRegenerate }: Pro
   const handleSaveEdit = () => {
     setItems(items.map(i =>
       i.id === editingId
-        ? { ...i, title: editTitle, duration: editDuration, difficulty: getDifficulty(editDuration) }
+        ? { ...i, title: editTitle, duration: editDuration }
         : i
     ))
     setEditingId(null)
@@ -76,12 +76,7 @@ export function SubtaskEditor({ subtasks, onConfirm, onBack, onRegenerate }: Pro
     setShowAdd(false)
   }
 
-  const getDifficulty = (duration: number): Difficulty => {
-    if (duration <= 10) return 'easy'
-    if (duration <= 20) return 'medium'
-    return 'hard'
-  }
-
+  
   const totalPoints = items.reduce((s, i) => s + (i.points || 10), 0)
   const totalMinutes = items.reduce((s, i) => s + i.duration, 0)
 

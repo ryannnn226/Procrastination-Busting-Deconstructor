@@ -32,7 +32,9 @@ export function BossBattle({ task, onDefeated, onRetreat }: Props) {
     if (timer <= 0) {
       // Time's up - player wins if boss HP < 50
       if (bossHp <= 50) {
-        handleVictory()
+        setShowConfetti(true)
+        setPhase('victory')
+        setTimeout(onDefeated, 3000)
       }
       return
     }
@@ -50,11 +52,16 @@ export function BossBattle({ task, onDefeated, onRetreat }: Props) {
         const damage = Math.floor(Math.random() * 8) + 3
         setHitEffect('player')
         setTimeout(() => setHitEffect(null), 500)
-        return Math.max(0, p - damage)
+        const newPlayerHp = Math.max(0, p - damage)
+        if (newPlayerHp <= 0) {
+          // Player defeated - not game over, but retreat
+          setTimeout(onRetreat, 2000)
+        }
+        return newPlayerHp
       })
     }, 8000)
     return () => clearInterval(interval)
-  }, [started, bossHp])
+  }, [started])  // eslint-disable-line
 
   const handleAttack = () => {
     if (!started) {
@@ -63,23 +70,22 @@ export function BossBattle({ task, onDefeated, onRetreat }: Props) {
       return
     }
     const damage = Math.floor(Math.random() * 15) + 10
+    setHitEffect('boss')
+    setTimeout(() => setHitEffect(null), 500)
     setBossHp(b => {
       const newHp = Math.max(0, b - damage)
-      setHitEffect('boss')
-      setTimeout(() => setHitEffect(null), 500)
       if (newHp <= 0) {
-        handleVictory()
+        setTimeout(() => {
+          setShowConfetti(true)
+          setPhase('victory')
+          setTimeout(onDefeated, 3000)
+        }, 100)
       }
       return newHp
     })
   }
 
-  const handleVictory = () => {
-    setShowConfetti(true)
-    setPhase('victory')
-    setTimeout(onDefeated, 3000)
-  }
-
+  
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60)
     const sec = s % 60
