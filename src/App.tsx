@@ -220,8 +220,9 @@ export default function App() {
           )}
           {phase === 'edit_subtasks' && pendingTaskInfo && (
             <motion.div key="edit_subtasks" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-              <SubtaskEditor key={regenKey}
+              <SubtaskEditor
                 subtasks={pendingSubtasks}
+                version={regenKey}
                 onConfirm={handleSubtasksConfirmed}
                 onBack={() => setPhase('future_mirror')}
                 onRegenerate={async () => {

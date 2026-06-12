@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Subtask, Difficulty } from '../lib/types'
 import { Edit3, Trash2, Plus, ChevronUp, ChevronDown, Check, X, Clock, Star } from 'lucide-react'
@@ -16,14 +16,19 @@ interface Props {
   onConfirm: (subtasks: Subtask[]) => void
   onBack: () => void
   onRegenerate: () => Promise<void>
+  version?: number
 }
 
-export function SubtaskEditor({ subtasks, onConfirm, onBack, onRegenerate }: Props) {
+export function SubtaskEditor({ subtasks, onConfirm, onBack, onRegenerate, version }: Props) {
   const [items, setItems] = useState<Subtask[]>(subtasks)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editDuration, setEditDuration] = useState(15)
   const [regenerating, setRegenerating] = useState(false)
+
+  useEffect(() => {
+    setItems(subtasks)
+  }, [version])
   const [showAdd, setShowAdd] = useState(false)
   const [newTitle, setNewTitle] = useState('')
   const [newDifficulty, setNewDifficulty] = useState<Difficulty>('medium')
