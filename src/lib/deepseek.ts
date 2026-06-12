@@ -6,7 +6,7 @@ const client = new OpenAI({
   dangerouslyAllowBrowser: true,
 })
 
-const MODEL = 'deepseek-v4-pro'
+const MODEL = 'deepseek-chat'
 
 export async function chat(messages: { role: 'system' | 'user' | 'assistant'; content: string }[]) {
   const response = await client.chat.completions.create({
