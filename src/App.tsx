@@ -115,11 +115,16 @@ export default function App() {
   }
 
   const handleCompleteSubtask = (taskId: string, subtaskId: string) => {
+    // Calculate points OUTSIDE the setState updater to avoid React StrictMode double-invocation
+    const targetTask = tasks.find(t => t.id === taskId)
+    const subtask = targetTask?.subtasks.find(s => s.id === subtaskId)
+    const earnPoints = subtask?.points || 10
+    addPoints(earnPoints)
+
     setTasks(prev => {
       const updated = prev.map(t => {
         if (t.id !== taskId) return t
         const completedIdx = t.subtasks.findIndex(x => x.id === subtaskId)
-        const completedSub = t.subtasks[completedIdx]
         const subs = t.subtasks.map((s, i) => {
           if (i === completedIdx) return { ...s, completed: true }
           if (i === completedIdx + 1) return { ...s, unlocked: true }
@@ -127,12 +132,10 @@ export default function App() {
         })
         const completedCount = subs.filter(s => s.completed).length
         const allDone = subs.every(s => s.completed)
-        const earned = (t.pointsEarned || 0) + (completedSub?.points || 10)
-        addPoints(completedSub?.points || 10)
+        const earned = (t.pointsEarned || 0) + earnPoints
         return { ...t, subtasks: subs, totalCompleted: completedCount, bossDefeated: allDone, pointsEarned: earned }
       })
       saveTasks(updated)
-      // Trigger flow break every 3 completed subtasks
       const totalCompleted = updated.reduce((s, t) => s + t.subtasks.filter(x => x.completed).length, 0)
       if (totalCompleted > 0 && totalCompleted % 3 === 0) {
         setTimeout(() => setShowFlowBreak(true), 500)
@@ -145,12 +148,15 @@ export default function App() {
 
   const handleBossDefeated = () => {
     if (!bossTaskId) return
+    const task = tasks.find(t => t.id === bossTaskId)
+    const bossSub = task?.subtasks.find(s => s.isBoss)
+    const bossPoints = bossSub?.points || 50
+    addPoints(bossPoints)
+
     setTasks(prev => {
       const updated = prev.map(t => {
         if (t.id !== bossTaskId) return t
-        const bossSub = t.subtasks.find(s => s.isBoss)
-        addPoints(bossSub?.points || 50)
-        return { ...t, bossDefeated: true, pointsEarned: (t.pointsEarned || 0) + (bossSub?.points || 50), subtasks: t.subtasks.map(s => s.isBoss ? { ...s, completed: true } : s) }
+        return { ...t, bossDefeated: true, pointsEarned: (t.pointsEarned || 0) + bossPoints, subtasks: t.subtasks.map(s => s.isBoss ? { ...s, completed: true } : s) }
       })
       saveTasks(updated)
       return updated
