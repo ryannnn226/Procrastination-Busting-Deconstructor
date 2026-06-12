@@ -38,9 +38,11 @@ export default function App() {
   const [taskFilter, setTaskFilter] = useState<TaskFilter>('all'); const [pendingSubtasks, setPendingSubtasks] = useState<Subtask[]>([])
   const [pendingTaskInfo, setPendingTaskInfo] = useState<{ name: string; deadline: string } | null>(null)
   const [regenKey, setRegenKey] = useState(0)
+  const [now, setNow] = useState(Date.now())
 
   useEffect(() => { const saved = loadTasks(); setTasks(saved); if (saved.length > 0) { setPersonality(saved[0].personality); setPhase('task_board') } }, [])
   useEffect(() => { document.documentElement.classList.toggle('light', !darkMode) }, [darkMode])
+  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 60000); return () => clearInterval(t) }, [])
 
   const getFilteredTasks = () => taskFilter === 'all' ? tasks : taskFilter === 'todo' ? tasks.filter(t => !t.bossDefeated) : tasks.filter(t => t.bossDefeated)
 
@@ -93,16 +95,24 @@ export default function App() {
   const handleStartPomodoro = (task: Task, subtaskId: string) => { setPomodoroTask({ task, subtaskId }) }
 
   
-  const getDeadlineWarnings = () => {
-    const now = Date.now()
-    return tasks.filter(t => {
-      if (t.bossDefeated) return false
-      const dl = new Date(t.deadline).getTime()
-      const hours = (dl - now) / 3600000
-      return hours <= 24
-    })
+  const [dismissedWarnings, setDismissedWarnings] = useState<Set<string>>(new Set())
+  
+  const getDeadlineInfo = (deadline: string) => {
+    const dl = new Date(deadline).getTime()
+    const diff = dl - now
+    const hours = diff / 3600000
+    if (hours <= 0) return { level: 'overdue' as const, text: '已过期 ' + Math.abs(Math.round(hours)) + 'h', className: 'text-red-400 font-bold' }
+    if (hours <= 6) return { level: 'critical' as const, text: Math.round(hours) + 'h后到期', className: 'text-red-400 animate-pulse font-bold' }
+    if (hours <= 24) return { level: 'urgent' as const, text: Math.round(hours) + 'h后到期', className: 'text-orange-400 font-semibold' }
+    if (hours <= 72) return { level: 'warning' as const, text: Math.round(hours / 24) + '天后到期', className: 'text-yellow-400' }
+    return null
   }
-  const deadlineWarnings = getDeadlineWarnings()
+
+  const activeWarnings = tasks.filter(t => {
+    if (t.bossDefeated || dismissedWarnings.has(t.id)) return false
+    const info = getDeadlineInfo(t.deadline)
+    return info !== null
+  })
 const pProfile = personality ? PERSONALITY_PROFILES[personality] : null; const points = getAvailablePoints()
 
   return (
@@ -119,18 +129,25 @@ const pProfile = personality ? PERSONALITY_PROFILES[personality] : null; const p
         </div>
       </header>
 
-      {deadlineWarnings.length > 0 && (
-        <div className="max-w-4xl mx-auto px-4 pt-3">
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-            className={'p-3 rounded-xl text-sm flex items-center gap-2 ' + (deadlineWarnings.some(t => new Date(t.deadline).getTime() < Date.now()) ? 'bg-red-500/15 border border-red-500/40 text-red-400' : 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-400')}>
-            <span className="text-lg">⏰</span>
-            <span>
-              {deadlineWarnings.some(t => new Date(t.deadline).getTime() < Date.now())
-                ? '以下任务已过期！'
-                : '以下任务即将到期：'}
-              {' '}{deadlineWarnings.map(t => t.name).join('、')}
-            </span>
-          </motion.div>
+      {activeWarnings.length > 0 && (
+        <div className="max-w-4xl mx-auto px-4 pt-3 space-y-2">
+          {activeWarnings.map(t => {
+            const info = getDeadlineInfo(t.deadline)
+            if (!info) return null
+            const isOverdue = info.level === 'overdue'
+            return (
+              <motion.div key={t.id} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                className={'p-3 rounded-xl text-sm flex items-center justify-between ' + (isOverdue ? 'bg-red-500/10 border border-red-500/30' : info.level === 'critical' ? 'bg-red-500/5 border border-red-500/20' : 'bg-yellow-500/5 border border-yellow-500/20')}>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className={'text-lg shrink-0 ' + (isOverdue ? '' : '')}>{isOverdue ? '🚨' : info.level === 'critical' ? '🔴' : '🟡'}</span>
+                  <span className="truncate font-medium">{t.name}</span>
+                  <span className={info.className + ' shrink-0 text-xs'}>{info.text}</span>
+                </div>
+                <button onClick={() => setDismissedWarnings(prev => new Set([...prev, t.id]))}
+                  className="shrink-0 ml-2 text-xs text-muted-foreground hover:text-foreground transition-colors">忽略</button>
+              </motion.div>
+            )
+          })}
         </div>
       )}
       <main className="max-w-4xl mx-auto px-4 py-8">

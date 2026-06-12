@@ -25,6 +25,9 @@ interface Props {
 export const TaskBoard = memo(function TaskBoard({ task, onCompleteSubtask, onStartBoss, onSlackOff, onFuneral, onDeleteTask, onUndoSubtask, onStartPomodoro }: Props) {
   const progress = task.subtasks.length > 0 ? Math.round((task.subtasks.filter(s => s.completed).length / task.subtasks.length) * 100) : 0
   const allCompleted = task.subtasks.every(s => s.completed || (s.isBoss && task.bossDefeated))
+  const dlHours = (new Date(task.deadline).getTime() - Date.now()) / 3600000
+  const dlUrgent = !task.bossDefeated && dlHours <= 24
+  const dlOverdue = !task.bossDefeated && dlHours <= 0
   const bossReady = task.subtasks.filter(s => !s.isBoss && !s.completed).length === 0 && !task.bossDefeated
 
   return (
