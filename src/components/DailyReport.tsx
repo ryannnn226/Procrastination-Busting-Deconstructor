@@ -43,7 +43,7 @@ export const DailyReport = memo(function DailyReport({ tasks }: Props) {
   }, [heatmapGrid])
 
   const getHeatColor = (level: number) => {
-    if (level === 0) return 'bg-secondary/30'
+    if (level === 0) return 'bg-[hsl(var(--muted))]/40'
     if (level <= 2) return 'bg-emerald-500/30'
     if (level <= 4) return 'bg-yellow-500/40'
     if (level <= 6) return 'bg-orange-500/50'
@@ -78,7 +78,7 @@ export const DailyReport = memo(function DailyReport({ tasks }: Props) {
               </div>
             </div>
 
-            <div className="p-3 rounded-lg bg-secondary/50 flex items-center gap-3">
+            <div className="p-3 rounded-lg bg-[hsl(var(--muted))]/60 flex items-center gap-3">
               <Clock className="w-5 h-5 text-yellow-400 shrink-0" />
               <div>
                 <p className="text-sm font-medium">最容易摆烂时段</p>

@@ -1,8 +1,9 @@
+
 import { memo } from 'react'
 import { motion } from 'framer-motion'
 import { Task } from '../lib/types'
 import { getAvailablePoints } from '../lib/shop'
-import { Flame, Trophy, TrendingUp, Star } from 'lucide-react'
+import { Flame, Trophy, TrendingUp, Star, Zap } from 'lucide-react'
 
 interface Props { tasks: Task[] }
 
@@ -11,29 +12,78 @@ export const StreakPanel = memo(function StreakPanel({ tasks }: Props) {
   const completedTasks = tasks.filter(t => t.bossDefeated)
   const currentStreak = tasks.length > 0 ? Math.max(1, ...tasks.map(t => t.streak)) : 0
   const availablePoints = getAvailablePoints()
+  const xp = totalCompleted * 15 + completedTasks.length * 100
+  const level = Math.floor(xp / 200) + 1
+  const xpToNext = 200 - (xp % 200)
+  const xpProgress = (xp % 200) / 200 * 100
 
   return (
-    <div className="grid grid-cols-4 gap-3 mb-6">
-      <motion.div whileHover={{ scale: 1.03, y: -2 }} className="bg-card border border-border rounded-xl p-3.5 text-center hover:border-primary/30 transition-all">
-        <Flame className={`w-5 h-5 mx-auto mb-1.5 ${currentStreak > 0 ? 'text-orange-400' : 'text-muted-foreground'}`} />
-        <p className="text-xl font-bold font-mono">{currentStreak}</p>
-        <p className="text-[10px] text-muted-foreground">连续天</p>
-      </motion.div>
-      <motion.div whileHover={{ scale: 1.03, y: -2 }} className="bg-card border border-border rounded-xl p-3.5 text-center hover:border-blue-400/30 transition-all">
-        <TrendingUp className="w-5 h-5 mx-auto mb-1.5 text-blue-400" />
-        <p className="text-xl font-bold font-mono">{totalCompleted}</p>
-        <p className="text-[10px] text-muted-foreground">小关完成</p>
-      </motion.div>
-      <motion.div whileHover={{ scale: 1.03, y: -2 }} className="bg-card border border-border rounded-xl p-3.5 text-center hover:border-yellow-400/30 transition-all">
-        <Trophy className="w-5 h-5 mx-auto mb-1.5 text-yellow-400" />
-        <p className="text-xl font-bold font-mono">{completedTasks.length}</p>
-        <p className="text-[10px] text-muted-foreground">已通关</p>
-      </motion.div>
-      <motion.div whileHover={{ scale: 1.03, y: -2 }} className="bg-card border border-border rounded-xl p-3.5 text-center hover:border-amber-400/30 transition-all bg-gradient-to-b from-amber-500/5 to-transparent">
-        <Star className="w-5 h-5 mx-auto mb-1.5 text-amber-400" />
-        <p className="text-xl font-bold font-mono text-amber-400">{availablePoints}</p>
-        <p className="text-[10px] text-muted-foreground">可用积分</p>
-      </motion.div>
+    <div className="mb-8">
+      {/* Hero Row */}
+      <div className="flex items-end justify-between mb-6">
+        <div>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">Adventurer</p>
+          <h2 className="text-3xl font-black gold-text tracking-tight">Level {level}</h2>
+          <p className="text-sm text-muted-foreground mt-1">{xpToNext} XP to Level {level + 1}</p>
+        </div>
+        <motion.div whileHover={{ scale: 1.05 }} className="text-right">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl gold-bg border border-[hsl(var(--gold)/0.2)]">
+            <Star className="w-4 h-4 text-[hsl(var(--gold))]" />
+            <span className="font-black text-lg text-[hsl(var(--gold))]">{availablePoints}</span>
+            <span className="text-xs text-[hsl(var(--gold)/0.7)]">pts</span>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* XP Bar */}
+      <div className="mb-6">
+        <div className="level-bar h-2">
+          <motion.div className="level-bar-fill" initial={{ width: 0 }} animate={{ width: xpProgress + '%' }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} />
+        </div>
+      </div>
+
+      {/* Stat Pill Row */}
+      <div className="flex gap-3">
+        <motion.div whileHover={{ y: -2 }} className="flex-1 p-4 rounded-2xl glass border border-[hsl(var(--border-glass))]">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-8 h-8 rounded-xl bg-orange-500/10 flex items-center justify-center">
+              <Flame className="w-4 h-4 text-orange-400" />
+            </div>
+            <p className="text-xl font-black font-mono">{currentStreak}</p>
+          </div>
+          <p className="text-[11px] text-muted-foreground">Day Streak</p>
+        </motion.div>
+
+        <motion.div whileHover={{ y: -2 }} className="flex-1 p-4 rounded-2xl glass border border-[hsl(var(--border-glass))]">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-blue-400" />
+            </div>
+            <p className="text-xl font-black font-mono">{totalCompleted}</p>
+          </div>
+          <p className="text-[11px] text-muted-foreground">Quests Done</p>
+        </motion.div>
+
+        <motion.div whileHover={{ y: -2 }} className="flex-1 p-4 rounded-2xl glass border border-[hsl(var(--border-glass))]">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center">
+              <Trophy className="w-4 h-4 text-amber-400" />
+            </div>
+            <p className="text-xl font-black font-mono">{completedTasks.length}</p>
+          </div>
+          <p className="text-[11px] text-muted-foreground">Cleared</p>
+        </motion.div>
+
+        <motion.div whileHover={{ y: -2 }} className="flex-1 p-4 rounded-2xl glass border border-[hsl(var(--border-glass))]">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-8 h-8 rounded-xl bg-[hsl(var(--gold)/0.1)] flex items-center justify-center">
+              <Zap className="w-4 h-4 text-[hsl(var(--gold))]" />
+            </div>
+            <p className="text-xl font-black font-mono text-[hsl(var(--gold))]">{xp}</p>
+          </div>
+          <p className="text-[11px] text-muted-foreground">Total XP</p>
+        </motion.div>
+      </div>
     </div>
   )
 })

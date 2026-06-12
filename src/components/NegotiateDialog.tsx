@@ -80,7 +80,7 @@ export function NegotiateDialog({ taskName, personality, onStay, onClose }: Prop
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-card rounded-2xl border border-border max-w-md w-full overflow-hidden"
+        className="bg-[hsl(var(--card))] rounded-[18px] border border-[hsl(var(--border-glass))] max-w-md w-full overflow-hidden"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
@@ -105,7 +105,7 @@ export function NegotiateDialog({ taskName, personality, onStay, onClose }: Prop
               <div
                 className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
                   msg.role === 'user'
-                    ? 'bg-primary text-primary-foreground rounded-br-md'
+                    ? 'bg-[hsl(var(--gold))] text-[hsl(var(--primary-foreground))] rounded-br-md'
                     : 'bg-secondary rounded-bl-md'
                 }`}
               >

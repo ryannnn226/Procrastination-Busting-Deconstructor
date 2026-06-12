@@ -118,7 +118,7 @@ export function SubtaskEditor({ subtasks, onConfirm, onBack, onRegenerate, versi
       </div>
 
       {showAdd ? (
-        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mb-4 p-3 rounded-xl border border-dashed border-primary/50 bg-primary/5">
+        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mb-4 p-3 rounded-[18px] border border-dashed border-primary/50 bg-primary/5">
           <div className="flex gap-2 mb-2">
             <input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="新关卡名称..."
               className="flex-1 px-3 py-2 text-sm rounded-lg bg-secondary border border-border focus:border-primary focus:outline-none" autoFocus

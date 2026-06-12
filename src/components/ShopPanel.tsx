@@ -84,7 +84,7 @@ export function ShopPanel({ onClose }: Props) {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-        className="bg-card rounded-2xl border border-border max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col">
+        className="bg-[hsl(var(--card))] rounded-[18px] border border-[hsl(var(--border-glass))] max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col">
 
         <div className="p-5 border-b border-border shrink-0">
           <div className="flex items-center justify-between mb-3">
@@ -110,7 +110,7 @@ export function ShopPanel({ onClose }: Props) {
           )}
         </div>
 
-        <div className="flex gap-1 p-1.5 mx-4 mt-2 rounded-xl bg-secondary/50 shrink-0 overflow-x-auto">
+        <div className="flex gap-1 p-1.5 mx-4 mt-2 rounded-xl bg-[hsl(var(--muted))]/60 shrink-0 overflow-x-auto">
           {TABS.map(([k, v, count]) => (
             <button key={k} onClick={() => setTab(k)}
               className={'whitespace-nowrap flex-1 py-1.5 px-1 rounded-lg text-xs font-medium transition-all ' + (tab === k ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground')}>
@@ -205,7 +205,7 @@ export function ShopPanel({ onClose }: Props) {
                   <p className="text-center text-muted-foreground text-sm py-8">暂无已使用的奖励</p>
                 ) : (
                   used.map(r => (
-                    <div key={r.id} className="flex items-center gap-3 p-4 rounded-xl border border-border bg-secondary/20 opacity-60">
+                    <div key={r.id} className="flex items-center gap-3 p-4 rounded-xl border border-border bg-[hsl(var(--muted))]/30 opacity-60">
                       <span className="text-2xl shrink-0">{r.itemEmoji}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -230,7 +230,7 @@ export function ShopPanel({ onClose }: Props) {
                   <p className="text-center text-muted-foreground text-sm py-8">暂无积分记录</p>
                 ) : (
                   transactions.map(tx => (
-                    <div key={tx.id} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30">
+                    <div key={tx.id} className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--muted))]/40">
                       {tx.type === 'earn' ? <TrendingUp className="w-4 h-4 text-emerald-400" /> : tx.type === 'checkin' ? <Gift className="w-4 h-4 text-yellow-400" /> : <TrendingDown className="w-4 h-4 text-red-400" />}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm truncate">{tx.reason}</p>

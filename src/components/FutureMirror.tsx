@@ -53,7 +53,7 @@ export function FutureMirror({ onDone, onBack }: Props) {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setChosenPath(scene.path)}
-              className={`relative p-5 rounded-xl border-2 cursor-pointer transition-all ${
+              className={`relative p-5 rounded-[18px] border-2 cursor-pointer transition-all ${
                 chosenPath === scene.path
                   ? scene.path === 'A'
                     ? 'border-emerald-500 bg-emerald-500/10'
@@ -142,7 +142,7 @@ export function FutureMirror({ onDone, onBack }: Props) {
             value={taskName}
             onChange={e => setTaskName(e.target.value)}
             placeholder="比如：写完毕业论文初稿"
-            className="w-full px-4 py-3 rounded-xl bg-secondary border border-border focus:border-primary focus:outline-none transition-colors"
+            className="w-full px-4 py-3 rounded-xl bg-[hsl(var(--muted))] border border-border focus:border-primary focus:outline-none transition-colors"
           />
         </div>
         <div>

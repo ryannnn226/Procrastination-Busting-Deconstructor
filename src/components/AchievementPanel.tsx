@@ -20,7 +20,7 @@ export function AchievementPanel({ onClose }: Props) {
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-        className="bg-card rounded-2xl border border-border max-w-md w-full max-h-[85vh] overflow-hidden flex flex-col">
+        className="bg-[hsl(var(--card))] rounded-[18px] border border-[hsl(var(--border-glass))] max-w-md w-full max-h-[85vh] overflow-hidden flex flex-col">
         <div className="p-5 border-b border-border shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2"><Trophy className="w-5 h-5 text-yellow-400" /><h2 className="text-lg font-bold">成就系统</h2></div>
@@ -41,7 +41,7 @@ export function AchievementPanel({ onClose }: Props) {
             const unlocked = unlockedIds.has(a.id)
             const progressVal = getProgressForAchievement(a.id, stats)
             return (
-              <div key={a.id} className={'flex items-center gap-3 p-3 rounded-xl border transition-all ' + (unlocked ? 'border-yellow-500/30 bg-yellow-500/5' : 'border-border bg-secondary/20 opacity-50')}>
+              <div key={a.id} className={'flex items-center gap-3 p-3 rounded-xl border transition-all ' + (unlocked ? 'border-yellow-500/30 bg-yellow-500/5' : 'border-border bg-[hsl(var(--muted))]/30 opacity-50')}>
                 <span className="text-2xl shrink-0">{unlocked ? a.emoji : '🔒'}</span>
                 <div className="flex-1 min-w-0">
                   <p className={'text-sm font-medium ' + (unlocked ? '' : 'text-muted-foreground')}>{a.name}</p>

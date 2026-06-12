@@ -16,7 +16,7 @@ export function FlowBreak({ onClose }: Props) {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-card rounded-2xl border border-border max-w-sm w-full overflow-hidden"
+        className="bg-[hsl(var(--card))] rounded-[18px] border border-[hsl(var(--border-glass))] max-w-sm w-full overflow-hidden"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-border">
@@ -193,7 +193,7 @@ function MiniPuzzle({ onBack, onDone }: { onBack: () => void; onDone: () => void
                   ? 'bg-purple-500/30 border border-purple-500'
                   : cell !== null
                   ? 'bg-secondary/80'
-                  : 'bg-secondary/30 hover:bg-secondary/50'
+                  : 'bg-[hsl(var(--muted))]/40 hover:bg-[hsl(var(--muted))]/60'
               }`}
             >
               {cell ?? ''}

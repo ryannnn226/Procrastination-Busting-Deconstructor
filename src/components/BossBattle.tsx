@@ -173,7 +173,7 @@ export function BossBattle({ task, onDefeated, onRetreat }: Props) {
               </div>
               <span className="font-mono font-bold">{bossHp}%</span>
             </div>
-            <div className="h-4 bg-secondary rounded-full overflow-hidden">
+            <div className="h-4 bg-[hsl(var(--muted))] rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-red-600 rounded-full"
                 initial={{ width: '100%' }}
