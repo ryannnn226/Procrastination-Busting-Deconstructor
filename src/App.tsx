@@ -130,6 +130,11 @@ export default function App() {
         return { ...t, subtasks: subs, totalCompleted: completedCount, bossDefeated: allDone, pointsEarned: earned }
       })
       saveTasks(updated)
+      // Trigger flow break every 3 completed subtasks
+      const totalCompleted = updated.reduce((s, t) => s + t.subtasks.filter(x => x.completed).length, 0)
+      if (totalCompleted > 0 && totalCompleted % 3 === 0) {
+        setTimeout(() => setShowFlowBreak(true), 500)
+      }
       return updated
     })
   }

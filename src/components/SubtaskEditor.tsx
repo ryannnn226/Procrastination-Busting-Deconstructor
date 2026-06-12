@@ -252,7 +252,7 @@ export function SubtaskEditor({ subtasks, onConfirm, onBack, onRegenerate }: Pro
         <button onClick={onBack} className="flex-1 py-3 border border-border rounded-xl text-sm hover:bg-secondary transition-colors">
           ← 返回
         </button>
-        <button onClick={async () => { setRegenerating(true); await onRegenerate(); setRegenerating(false); }} disabled={regenerating} className="px-4 py-3 border border-border rounded-xl text-sm text-muted-foreground hover:bg-secondary transition-colors disabled:opacity-50">
+        <button onClick={async () => { setRegenerating(true); try { await onRegenerate() } catch(e) { console.error(e) } finally { setRegenerating(false) } }} disabled={regenerating} className="px-4 py-3 border border-border rounded-xl text-sm text-muted-foreground hover:bg-secondary transition-colors disabled:opacity-50">
           🔄 重新生成
         </button>
         <button
