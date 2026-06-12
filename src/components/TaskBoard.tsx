@@ -36,7 +36,7 @@ export const TaskBoard = memo(function TaskBoard({ task, onCompleteSubtask, onSt
             <h3 className="font-bold text-lg">{task.name}{allCompleted && ' 🎉'}</h3>
             {onDeleteTask && !allCompleted && <button onClick={onDeleteTask} className="text-xs text-muted-foreground hover:text-red-400 transition-colors">🗑 删除</button>}
           </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1"><span>截止：{task.deadline}</span><span>·</span><span>{task.subtasks.length} 关</span><span>·</span><span className="flex items-center gap-1 text-yellow-400"><Star className="w-3 h-3" />{task.pointsEarned || 0} 积分</span></div>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1"><span className={(new Date(task.deadline).getTime() < Date.now() && !task.bossDefeated) ? 'text-red-400 font-semibold' : ''}>截止：{task.deadline}{(new Date(task.deadline).getTime() - Date.now()) / 3600000 <= 24 && !task.bossDefeated ? ' ⚠️' : ''}</span><span>·</span><span>{task.subtasks.length} 关</span><span>·</span><span className="flex items-center gap-1 text-yellow-400"><Star className="w-3 h-3" />{task.pointsEarned || 0} 积分</span></div>
         </div>
         {task.bossDefeated && <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity }}><Trophy className="w-7 h-7 text-yellow-400 drop-shadow-lg" /></motion.div>}
       </div>

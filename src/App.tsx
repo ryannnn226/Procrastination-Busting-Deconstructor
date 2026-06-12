@@ -92,7 +92,18 @@ export default function App() {
   }
   const handleStartPomodoro = (task: Task, subtaskId: string) => { setPomodoroTask({ task, subtaskId }) }
 
-  const pProfile = personality ? PERSONALITY_PROFILES[personality] : null; const points = getAvailablePoints()
+  
+  const getDeadlineWarnings = () => {
+    const now = Date.now()
+    return tasks.filter(t => {
+      if (t.bossDefeated) return false
+      const dl = new Date(t.deadline).getTime()
+      const hours = (dl - now) / 3600000
+      return hours <= 24
+    })
+  }
+  const deadlineWarnings = getDeadlineWarnings()
+const pProfile = personality ? PERSONALITY_PROFILES[personality] : null; const points = getAvailablePoints()
 
   return (
     <div className={'min-h-screen transition-colors duration-500 ' + (darkMode ? '' : 'light')}>
@@ -107,6 +118,21 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {deadlineWarnings.length > 0 && (
+        <div className="max-w-4xl mx-auto px-4 pt-3">
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+            className={'p-3 rounded-xl text-sm flex items-center gap-2 ' + (deadlineWarnings.some(t => new Date(t.deadline).getTime() < Date.now()) ? 'bg-red-500/15 border border-red-500/40 text-red-400' : 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-400')}>
+            <span className="text-lg">⏰</span>
+            <span>
+              {deadlineWarnings.some(t => new Date(t.deadline).getTime() < Date.now())
+                ? '以下任务已过期！'
+                : '以下任务即将到期：'}
+              {' '}{deadlineWarnings.map(t => t.name).join('、')}
+            </span>
+          </motion.div>
+        </div>
+      )}
       <main className="max-w-4xl mx-auto px-4 py-8">
         <AnimatePresence mode="wait">
           {phase === 'personality' && <motion.div key="p" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}><PersonalityTest onDone={handlePersonalityDone} /></motion.div>}
