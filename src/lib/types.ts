@@ -93,3 +93,27 @@ export interface FutureScene {
   scene: string
   consequence: string
 }
+
+export interface Achievement {
+  id: string
+  name: string
+  description: string
+  emoji: string
+  condition: (stats: AchievementStats) => boolean
+}
+
+export interface AchievementStats {
+  totalSubtasksCompleted: number
+  totalTasksCompleted: number
+  totalBossesDefeated: number
+  totalPointsEarned: number
+  currentStreak: number
+  bestStreak: number
+  totalFlowBreaks: number
+  totalNegotiations: number
+}
+
+export interface UnlockedAchievement {
+  id: string
+  unlockedAt: string
+}
