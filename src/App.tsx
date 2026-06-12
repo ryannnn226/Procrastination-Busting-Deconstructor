@@ -37,6 +37,7 @@ export default function App() {
   const [showShop, setShowShop] = useState(false)
   const [taskFilter, setTaskFilter] = useState<TaskFilter>('all')
   const [pendingSubtasks, setPendingSubtasks] = useState<Subtask[]>([])
+  const [regenKey, setRegenKey] = useState(0)
   const [pendingTaskInfo, setPendingTaskInfo] = useState<{ name: string; deadline: string } | null>(null)
 
   useEffect(() => {
@@ -209,13 +210,14 @@ export default function App() {
           )}
           {phase === 'edit_subtasks' && pendingTaskInfo && (
             <motion.div key="edit_subtasks" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
-              <SubtaskEditor
+              <SubtaskEditor key={regenKey}
                 subtasks={pendingSubtasks}
                 onConfirm={handleSubtasksConfirmed}
                 onBack={() => setPhase('future_mirror')}
                 onRegenerate={async () => {
                   const newSubs = await decomposeTask(pendingTaskInfo.name, pendingTaskInfo.deadline, personality || 'avoider')
                   setPendingSubtasks(newSubs)
+                  setRegenKey(k => k + 1)
                 }}
               />
             </motion.div>
