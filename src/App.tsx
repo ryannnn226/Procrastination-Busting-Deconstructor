@@ -38,6 +38,7 @@ export default function App() {
   const [taskFilter, setTaskFilter] = useState<TaskFilter>('all')
   const [pendingSubtasks, setPendingSubtasks] = useState<Subtask[]>([])
   const [regenKey, setRegenKey] = useState(0)
+  const [showApiWarning, setShowApiWarning] = useState(!import.meta.env.VITE_DEEPSEEK_API_KEY)
   const [pendingTaskInfo, setPendingTaskInfo] = useState<{ name: string; deadline: string } | null>(null)
 
   useEffect(() => {
@@ -195,6 +196,15 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {showApiWarning && (
+        <div className="max-w-4xl mx-auto px-4 pt-3">
+          <div className="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-sm text-yellow-400 flex items-center justify-between">
+            <span>⚠️ 未配置 DeepSeek API Key，AI 功能不可用。请在项目根目录 <code className="px-1.5 py-0.5 rounded bg-yellow-500/20 text-xs">.env</code> 文件中填入 <code className="px-1.5 py-0.5 rounded bg-yellow-500/20 text-xs">VITE_DEEPSEEK_API_KEY</code></span>
+            <button onClick={() => setShowApiWarning(false)} className="shrink-0 ml-3 text-yellow-400/60 hover:text-yellow-400">✕</button>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-4xl mx-auto px-4 py-8">
         <AnimatePresence mode="wait">

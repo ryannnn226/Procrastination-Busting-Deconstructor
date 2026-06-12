@@ -81,11 +81,14 @@ export async function decomposeTask(
       reward: s.reward || '继续前进，你能行！',
     }))
   } catch {
+    // Dynamic fallback based on task name
+    const name = taskName
     return [
-      { id: `sub-${Date.now()}-0`, title: '打开文档，写下标题', duration: 5, difficulty: 'easy', completed: false, isBoss: false, unlocked: true, points: 10, reward: '第一步就是胜利！' },
-      { id: `sub-${Date.now()}-1`, title: '列出大纲框架', duration: 15, difficulty: 'medium', completed: false, isBoss: false, unlocked: false, points: 20, reward: '框架搭好，事情就成了一半！' },
-      { id: `sub-${Date.now()}-2`, title: '完成第一部分内容', duration: 20, difficulty: 'hard', completed: false, isBoss: false, unlocked: false, points: 30, reward: '渐入佳境！' },
-      { id: `sub-${Date.now()}-3`, title: '完成剩余内容并整理', duration: 20, difficulty: 'boss', completed: false, isBoss: true, unlocked: false, points: 50, reward: '最后一战，冲！' },
+      { id: `sub-${Date.now()}-0`, title: `准备「${name}」所需的材料和工具`, duration: 5, difficulty: 'easy', completed: false, isBoss: false, unlocked: true, points: 10, reward: '准备就绪，万事开头易！' },
+      { id: `sub-${Date.now()}-1`, title: `开始执行「${name}」的第一步`, duration: 15, difficulty: 'medium', completed: false, isBoss: false, unlocked: false, points: 20, reward: '已经动起来了，继续保持！' },
+      { id: `sub-${Date.now()}-2`, title: `完成「${name}」的核心部分`, duration: 20, difficulty: 'hard', completed: false, isBoss: false, unlocked: false, points: 30, reward: '核心搞定了，胜利在望！' },
+      { id: `sub-${Date.now()}-3`, title: `检查并完善「${name}」的成果`, duration: 15, difficulty: 'medium', completed: false, isBoss: false, unlocked: false, points: 20, reward: '精益求精！' },
+      { id: `sub-${Date.now()}-4`, title: `收尾整理，完成「${name}」！`, duration: 10, difficulty: 'boss', completed: false, isBoss: true, unlocked: false, points: 50, reward: '最后一战，冲！' },
     ]
   }
 }
