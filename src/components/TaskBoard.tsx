@@ -29,7 +29,9 @@ export const TaskBoard = memo(function TaskBoard({ task, onCompleteSubtask, onSt
   const progress = task.subtasks.length > 0 ? Math.round((task.subtasks.filter(s => s.completed).length / task.subtasks.length) * 100) : 0
   const allCompleted = task.subtasks.every(s => s.completed || (s.isBoss && task.bossDefeated))
   const bossReady = task.subtasks.filter(s => !s.isBoss && !s.completed).length === 0 && !task.bossDefeated
-  const dlHours = (new Date(task.deadline).getTime() - Date.now()) / 3600000
+  const parseDeadlineLocal = (dateStr: string) => { const [y, m, d] = dateStr.split('-').map(Number); return new Date(y, m - 1, d, 23, 59, 59) };
+  const dl = parseDeadlineLocal(task.deadline);
+  const dlHours = (dl.getTime() - Date.now()) / 3600000
   const dlUrgent = !task.bossDefeated && dlHours <= 24
   const dlOverdue = !task.bossDefeated && dlHours <= 0
 
@@ -55,9 +57,9 @@ export const TaskBoard = memo(function TaskBoard({ task, onCompleteSubtask, onSt
               )}
             </div>
             <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-              <span>Due {task.deadline}</span>
+              <span>{t('quest.due')} {task.deadline}</span>
               {dlOverdue ? <span className="text-red-400 font-semibold animate-pulse">{t('quest.overdue')}</span>
-               : dlUrgent ? <span className="text-orange-400 font-semibold">{Math.round(dlHours)}h left</span>
+               : dlUrgent ? <span className="text-orange-400 font-semibold">{t('deadline.hoursLeft', Math.round(dlHours).toString())}</span>
                : null}
             </div>
           </div>

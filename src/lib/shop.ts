@@ -1,4 +1,9 @@
 
+function getLocalDateStr(): string {
+  const d = new Date()
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0')
+}
+
 import { ShopItem } from './types'
 
 const SHOP_KEY = 'deconstructor_shop'
@@ -66,11 +71,11 @@ export function getTotalSpent(): number { return getTransactions().filter(t => t
 export function getCheckinStatus(): { checked: boolean; streak: number } {
   try {
     const d = JSON.parse(localStorage.getItem(CHECKIN_KEY) || '{"date":"","streak":0}')
-    return { checked: d.date === new Date().toISOString().slice(0, 10), streak: d.streak || 0 }
+    return { checked: d.date === getLocalDateStr(), streak: d.streak || 0 }
   } catch { return { checked: false, streak: 0 } }
 }
 export function doCheckin(): { points: number; streak: number } {
-  const points = 5 + Math.floor(Math.random() * 11); const today = new Date().toISOString().slice(0, 10)
+  const points = 5 + Math.floor(Math.random() * 11); const today = getLocalDateStr()
   const s = getCheckinStatus(); const newStreak = s.checked ? s.streak : s.streak + 1
   localStorage.setItem(CHECKIN_KEY, JSON.stringify({ date: today, streak: newStreak }))
   addPoints(points, 'daily_checkin'); return { points, streak: newStreak }

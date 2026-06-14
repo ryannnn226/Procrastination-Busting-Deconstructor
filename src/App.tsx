@@ -122,9 +122,13 @@ export default function App() {
   
   const [dismissedWarnings, setDismissedWarnings] = useState<Set<string>>(new Set())
   
+  const parseDeadlineLocal = (dateStr: string) => {
+    const [y, m, d] = dateStr.split('-').map(Number)
+    return new Date(y, m - 1, d, 23, 59, 59)
+  }
   const getDeadlineInfo = (deadline: string) => {
-    const dl = new Date(deadline).getTime()
-    const diff = dl - now
+    const dl = parseDeadlineLocal(deadline).getTime()
+    const diff = dl - Date.now()
     const hours = diff / 3600000
     if (hours <= 0) return { level: 'overdue' as const, text: tr('deadline.overdue', Math.abs(Math.round(hours)).toString()), className: 'text-red-400 font-bold' }
     if (hours <= 6) return { level: 'critical' as const, text: tr('deadline.hoursLeft', Math.round(hours).toString()), className: 'text-red-400 animate-pulse font-bold' }

@@ -243,6 +243,7 @@ const translations: Record<string, Record<Lang, string>> = {
   'pomodoro.noSubtask': { zh: '无可用的未锁定子任务', en: 'No unlocked subtask available' },
   'pomodoro.focusOn': { zh: '专注完成', en: 'Focus on' },
   'quest.complete': { zh: '任务完成 🎉', en: 'Quest Complete 🎉' },
+  'quest.due': { zh: '截止', en: 'Due' },
   'quest.focus': { zh: '专注', en: 'Focus' },
   'quest.funeral': { zh: '举行葬礼 🪦', en: 'Hold a funeral 🪦' },
   'quest.lazy': { zh: '想摸鱼了？点这里 🏃', en: 'Feeling lazy? Tap here 🏃' },
