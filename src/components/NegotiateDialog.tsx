@@ -151,7 +151,7 @@ export function NegotiateDialog({ taskName, personality, onStay, onClose }: Prop
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder="{t('negotiate.placeholder')}"
+              placeholder={t('negotiate.placeholder')}
               className="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border focus:border-primary focus:outline-none text-sm"
               disabled={loading}
             />

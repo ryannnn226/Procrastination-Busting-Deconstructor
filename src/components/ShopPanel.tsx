@@ -163,7 +163,7 @@ export function ShopPanel({ onClose }: Props) {
                     ))}</div>
                     <div className="flex gap-2">
                       <input value={newItem.name} onChange={e => setNewItem({ ...newItem, name: e.target.value })}
-                        placeholder="{t('shop.rewardNamePlaceholder')}" className="flex-1 px-3 py-2 text-sm rounded-lg bg-secondary border border-border focus:border-primary focus:outline-none" />
+                        placeholder={t('shop.rewardNamePlaceholder')} className="flex-1 px-3 py-2 text-sm rounded-lg bg-secondary border border-border focus:border-primary focus:outline-none" />
                       <input type="number" value={newItem.cost} onChange={e => setNewItem({ ...newItem, cost: Number(e.target.value) || 10 })}
                         className="w-20 px-2 py-2 text-sm rounded-lg bg-secondary border border-border" min={10} max={999} />
                       <button onClick={handleAddItem} className="px-3 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium">{t('shop.add')}</button>

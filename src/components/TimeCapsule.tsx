@@ -45,7 +45,7 @@ export function TimeCapsuleModal({ taskName, onDone, onSkip }: Props) {
             <textarea
               value={message}
               onChange={e => setMessage(e.target.value)}
-              placeholder="{t('capsule.placeholder')}"
+              placeholder={t('capsule.placeholder')}
               rows={4}
               className="w-full px-4 py-3 rounded-xl bg-secondary border border-border focus:border-primary focus:outline-none resize-none text-sm transition-colors"
               autoFocus
