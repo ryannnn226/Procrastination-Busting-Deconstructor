@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { useT } from '../lib/i18n.tsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Coffee, Wind, Puzzle, Music, X } from 'lucide-react'
 
@@ -9,6 +10,7 @@ interface Props {
 type BreakType = 'menu' | 'breathing' | 'puzzle' | 'soundscape'
 
 export function FlowBreak({ onClose }: Props) {
+  const { t } = useT()
   const [mode, setMode] = useState<BreakType>('menu')
 
   return (
@@ -22,7 +24,7 @@ export function FlowBreak({ onClose }: Props) {
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-2">
             <Coffee className="w-5 h-5 text-primary" />
-            <h3 className="font-semibold">心流小憩 · 90 秒</h3>
+            <h3 className="font-semibold">{t('flow.title')}</h3>
           </div>
           <button onClick={onClose} className="p-1 hover:bg-secondary rounded-lg transition-colors">
             <X className="w-4 h-4" />
@@ -40,7 +42,7 @@ export function FlowBreak({ onClose }: Props) {
                 className="space-y-3"
               >
                 <p className="text-sm text-muted-foreground mb-4">
-                  别刷手机了，选一个真正恢复专注力的方式吧～
+                  {t('flow.subtitle')}
                 </p>
 
                 <button
@@ -51,8 +53,8 @@ export function FlowBreak({ onClose }: Props) {
                     <Wind className="w-5 h-5 text-blue-400" />
                   </div>
                   <div className="text-left">
-                    <p className="font-medium text-sm">4-7-8 呼吸法</p>
-                    <p className="text-xs text-muted-foreground">4秒吸 · 7秒屏 · 8秒呼</p>
+                    <p className="font-medium text-sm">{t('flow.breathing')}</p>
+                    <p className="text-xs text-muted-foreground">{t('flow.breathingDesc')}</p>
                   </div>
                 </button>
 
@@ -64,8 +66,8 @@ export function FlowBreak({ onClose }: Props) {
                     <Puzzle className="w-5 h-5 text-purple-400" />
                   </div>
                   <div className="text-left">
-                    <p className="font-medium text-sm">快速数独</p>
-                    <p className="text-xs text-muted-foreground">激活大脑，切换思维模式</p>
+                    <p className="font-medium text-sm">{t('flow.sudoku')}</p>
+                    <p className="text-xs text-muted-foreground">{t('flow.sudokuDesc')}</p>
                   </div>
                 </button>
 
@@ -77,8 +79,8 @@ export function FlowBreak({ onClose }: Props) {
                     <Music className="w-5 h-5 text-emerald-400" />
                   </div>
                   <div className="text-left">
-                    <p className="font-medium text-sm">白噪音场景</p>
-                    <p className="text-xs text-muted-foreground">雨声 · 篝火 · 森林</p>
+                    <p className="font-medium text-sm">{t('flow.soundscape')}</p>
+                    <p className="text-xs text-muted-foreground">{t('flow.soundscapeDesc')}</p>
                   </div>
                 </button>
               </motion.div>
@@ -104,6 +106,7 @@ export function FlowBreak({ onClose }: Props) {
 
 // --- Breathing Exercise ---
 function BreathingExercise({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+  const { t } = useT()
   const [step, setStep] = useState<'inhale' | 'hold' | 'exhale'>('inhale')
   const [seconds, setSeconds] = useState(4)
   const [cycles, setCycles] = useState(0)
@@ -131,7 +134,7 @@ function BreathingExercise({ onBack, onDone }: { onBack: () => void; onDone: () 
   return (
     <div className="text-center py-4">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground mb-4">
-        ← 返回菜单
+        {t('flow.backMenu')}
       </button>
       <div className="relative w-32 h-32 mx-auto mb-6">
         <motion.div
@@ -143,18 +146,19 @@ function BreathingExercise({ onBack, onDone }: { onBack: () => void; onDone: () 
           <div>
             <p className="text-3xl font-bold font-mono">{seconds}</p>
             <p className="text-xs text-blue-400 font-medium mt-1">
-              {step === 'inhale' ? '吸气' : step === 'hold' ? '屏息' : '呼气'}
+              {step === 'inhale' ? t('flow.inhale') : step === 'hold' ? t('flow.hold') : t('flow.exhale')}
             </p>
           </div>
         </div>
       </div>
-      <p className="text-xs text-muted-foreground">已完成 {cycles}/5 轮</p>
+      <p className="text-xs text-muted-foreground">{t('flow.cyclesDone').replace('{0}', String(cycles))}</p>
     </div>
   )
 }
 
 // --- Mini Puzzle ---
 function MiniPuzzle({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+  const { t } = useT()
   const [grid, setGrid] = useState<(number | null)[][]>(() => generateEasySudoku())
   const [selected, setSelected] = useState<[number, number] | null>(null)
   const [moves, setMoves] = useState(0)
@@ -179,9 +183,9 @@ function MiniPuzzle({ onBack, onDone }: { onBack: () => void; onDone: () => void
   return (
     <div className="text-center py-2">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground mb-4">
-        ← 返回菜单
+        {t('flow.backMenu')}
       </button>
-      <p className="text-sm text-muted-foreground mb-3">填入 5 个数字即可（快速版）</p>
+      <p className="text-sm text-muted-foreground mb-3">{t('flow.sudokuHint')}</p>
       <div className="inline-grid grid-cols-4 gap-0.5 mb-4">
         {grid.map((row, r) =>
           row.map((cell, c) => (
@@ -212,20 +216,22 @@ function MiniPuzzle({ onBack, onDone }: { onBack: () => void; onDone: () => void
           </button>
         ))}
       </div>
-      <p className="text-xs text-muted-foreground mt-2">已填 {moves}/5</p>
+      <p className="text-xs text-muted-foreground mt-2">{t('flow.moves').replace('{0}', String(moves))}</p>
     </div>
   )
 }
 
 // --- Sound Scape ---
-const SOUNDS = [
-  { label: '🌧️ 雨声', color: 'bg-blue-500/10 hover:bg-blue-500/20', active: 'bg-blue-500/30 border-blue-500' },
-  { label: '🔥 篝火', color: 'bg-orange-500/10 hover:bg-orange-500/20', active: 'bg-orange-500/30 border-orange-500' },
-  { label: '🌿 森林', color: 'bg-emerald-500/10 hover:bg-emerald-500/20', active: 'bg-emerald-500/30 border-emerald-500' },
-  { label: '🌊 海浪', color: 'bg-cyan-500/10 hover:bg-cyan-500/20', active: 'bg-cyan-500/30 border-cyan-500' },
-]
+
 
 function SoundScape({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
+  const { t } = useT()
+  const SOUNDS = [
+    { id: 'rain', label: t('flow.rainLabel'), color: 'bg-blue-500/10 hover:bg-blue-500/20', active: 'bg-blue-500/30 border-blue-500' },
+    { id: 'fire', label: t('flow.fireLabel'), color: 'bg-orange-500/10 hover:bg-orange-500/20', active: 'bg-orange-500/30 border-orange-500' },
+    { id: 'forest', label: t('flow.forestLabel'), color: 'bg-emerald-500/10 hover:bg-emerald-500/20', active: 'bg-emerald-500/30 border-emerald-500' },
+    { id: 'ocean', label: t('flow.oceanLabel'), color: 'bg-cyan-500/10 hover:bg-cyan-500/20', active: 'bg-cyan-500/30 border-cyan-500' },
+  ]
   const [active, setActive] = useState<string | null>(null)
   const [countdown, setCountdown] = useState(90)
 
@@ -242,7 +248,7 @@ function SoundScape({ onBack, onDone }: { onBack: () => void; onDone: () => void
   return (
     <div className="text-center py-2">
       <button onClick={onBack} className="text-xs text-muted-foreground hover:text-foreground mb-4">
-        ← 返回菜单
+        {t('flow.backMenu')}
       </button>
       {active ? (
         <div>
@@ -257,17 +263,17 @@ function SoundScape({ onBack, onDone }: { onBack: () => void; onDone: () => void
           <p className="text-2xl font-mono font-bold mb-4">
             {Math.floor(countdown / 60)}:{String(countdown % 60).padStart(2, '0')}
           </p>
-          <p className="text-xs text-muted-foreground mb-4">闭上眼睛，放松一下</p>
+          <p className="text-xs text-muted-foreground mb-4">{t('flow.relax')}</p>
           <button
             onClick={onDone}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm hover:opacity-90"
           >
-            我休息好了
+            {t('flow.restDone')}
           </button>
         </div>
       ) : (
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground mb-3">选择一个背景音，放松 90 秒</p>
+          <p className="text-sm text-muted-foreground mb-3">{t('flow.pickScene')}</p>
           {SOUNDS.map(s => (
             <button
               key={s.label}

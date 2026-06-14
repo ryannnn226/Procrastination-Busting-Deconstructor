@@ -1,4 +1,5 @@
 
+import { useT } from '../lib/i18n.tsx'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ACHIEVEMENTS, getUnlocked, getAchievementStats, getAchievementProgress } from '../lib/achievements'
@@ -7,6 +8,7 @@ import { Trophy, Lock, Medal } from 'lucide-react'
 interface Props { onClose: () => void }
 
 export function AchievementPanel({ onClose }: Props) {
+  const { t } = useT()
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set())
   const [stats, setStats] = useState(getAchievementStats())
   const [progress, setProgress] = useState(getAchievementProgress())
@@ -23,12 +25,12 @@ export function AchievementPanel({ onClose }: Props) {
         className="bg-[hsl(var(--card))] rounded-[18px] border border-[hsl(var(--border-glass))] max-w-md w-full max-h-[85vh] overflow-hidden flex flex-col">
         <div className="p-5 border-b border-border shrink-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2"><Trophy className="w-5 h-5 text-yellow-400" /><h2 className="text-lg font-bold">成就系统</h2></div>
-            <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">关闭 ✕</button>
+            <div className="flex items-center gap-2"><Trophy className="w-5 h-5 text-yellow-400" /><h2 className="text-lg font-bold">{t('achievement.title')}</h2></div>
+            <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">{t('achievement.close')}</button>
           </div>
           <div className="mt-2 text-center">
             <span className="text-2xl font-black text-yellow-400">{progress.unlocked}</span>
-            <span className="text-muted-foreground text-sm"> / {progress.total} 已解锁</span>
+            <span className="text-muted-foreground text-sm"> / {progress.total} {t('achievement.unlocked')}</span>
           </div>
           <div className="h-1.5 mt-2 bg-secondary rounded-full overflow-hidden">
             <motion.div className="h-full bg-yellow-400 rounded-full"
@@ -44,8 +46,8 @@ export function AchievementPanel({ onClose }: Props) {
               <div key={a.id} className={'flex items-center gap-3 p-3 rounded-xl border transition-all ' + (unlocked ? 'border-yellow-500/30 bg-yellow-500/5' : 'border-border bg-[hsl(var(--muted))]/30 opacity-50')}>
                 <span className="text-2xl shrink-0">{unlocked ? a.emoji : '🔒'}</span>
                 <div className="flex-1 min-w-0">
-                  <p className={'text-sm font-medium ' + (unlocked ? '' : 'text-muted-foreground')}>{a.name}</p>
-                  <p className="text-xs text-muted-foreground">{a.description}</p>
+                  <p className={'text-sm font-medium ' + (unlocked ? '' : 'text-muted-foreground')}>{t('achievement.' + a.id + '.name')}</p>
+                  <p className="text-xs text-muted-foreground">{t('achievement.' + a.id + '.desc')}</p>
                   {!unlocked && progressVal !== undefined && (
                     <div className="mt-1 h-1 bg-secondary rounded-full overflow-hidden w-24">
                       <div className="h-full bg-yellow-500/50 rounded-full" style={{ width: Math.min(100, progressVal) + '%' }} />

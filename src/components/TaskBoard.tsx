@@ -1,14 +1,15 @@
 
 import { memo, useState } from 'react'
+import { useT } from '../lib/i18n.tsx'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Task, Difficulty } from '../lib/types'
 import { CheckCircle2, Circle, Skull, Siren, Clock, Star, Sword, Sparkles } from 'lucide-react'
 
-const DIFFICULTY_CONFIG: Record<Difficulty, { label: string; color: string; bg: string; icon: string }> = {
-  easy: { label: 'Easy', color: 'text-emerald-400 border-emerald-500/30', bg: 'bg-emerald-500/5', icon: '🟢' },
-  medium: { label: 'Medium', color: 'text-yellow-400 border-yellow-500/30', bg: 'bg-yellow-500/5', icon: '🟡' },
-  hard: { label: 'Hard', color: 'text-orange-400 border-orange-500/30', bg: 'bg-orange-500/5', icon: '🟠' },
-  boss: { label: 'Boss', color: 'text-red-400 border-red-500/40', bg: 'bg-red-500/5', icon: '💀' },
+const DIFFICULTY_CONFIG: Record<Difficulty, { labelKey: string; color: string; bg: string; icon: string }> = {
+  easy: { labelKey: 'diff.easy', color: 'text-emerald-400 border-emerald-500/30', bg: 'bg-emerald-500/5', icon: '🟢' },
+  medium: { labelKey: 'diff.medium', color: 'text-yellow-400 border-yellow-500/30', bg: 'bg-yellow-500/5', icon: '🟡' },
+  hard: { labelKey: 'diff.hard', color: 'text-orange-400 border-orange-500/30', bg: 'bg-orange-500/5', icon: '🟠' },
+  boss: { labelKey: 'diff.boss', color: 'text-red-400 border-red-500/40', bg: 'bg-red-500/5', icon: '💀' },
 }
 
 interface Props {
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export const TaskBoard = memo(function TaskBoard({ task, onCompleteSubtask, onStartBoss, onSlackOff, onFuneral, onDeleteTask, onUndoSubtask, onStartPomodoro }: Props) {
+  const { t } = useT()
   const [xpFly, setXpFly] = useState<string | null>(null)
   const progress = task.subtasks.length > 0 ? Math.round((task.subtasks.filter(s => s.completed).length / task.subtasks.length) * 100) : 0
   const allCompleted = task.subtasks.every(s => s.completed || (s.isBoss && task.bossDefeated))
@@ -49,12 +51,12 @@ export const TaskBoard = memo(function TaskBoard({ task, onCompleteSubtask, onSt
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-bold text-[17px] tracking-tight truncate">{task.name}</h3>
               {onDeleteTask && !allCompleted && (
-                <button onClick={onDeleteTask} className="shrink-0 text-xs text-muted-foreground/50 hover:text-red-400 transition-colors ml-auto">Remove</button>
+                <button onClick={onDeleteTask} className="shrink-0 text-xs text-muted-foreground/50 hover:text-red-400 transition-colors ml-auto">{t('quest.remove')}</button>
               )}
             </div>
             <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
               <span>Due {task.deadline}</span>
-              {dlOverdue ? <span className="text-red-400 font-semibold animate-pulse">Overdue</span>
+              {dlOverdue ? <span className="text-red-400 font-semibold animate-pulse">{t('quest.overdue')}</span>
                : dlUrgent ? <span className="text-orange-400 font-semibold">{Math.round(dlHours)}h left</span>
                : null}
             </div>
@@ -117,7 +119,7 @@ export const TaskBoard = memo(function TaskBoard({ task, onCompleteSubtask, onSt
                       {sub.title}
                     </span>
                     <span className={'text-[10px] px-1.5 py-0.5 rounded-md font-semibold border ' + diff.color + ' ' + diff.bg}>
-                      {diff.label}
+                      {t(diff.labelKey)}
                     </span>
                     {sub.isBoss && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-red-500/15 text-red-400 border border-red-500/20 font-bold flex items-center gap-0.5">
@@ -131,7 +133,7 @@ export const TaskBoard = memo(function TaskBoard({ task, onCompleteSubtask, onSt
                   )}
                   {sub.completed && onUndoSubtask && (
                     <button onClick={e => { e.stopPropagation(); onUndoSubtask(sub.id) }}
-                      className="text-[10px] text-muted-foreground/50 hover:text-yellow-400 mt-0.5 transition-colors">↩ Undo</button>
+                      className="text-[10px] text-muted-foreground/50 hover:text-yellow-400 mt-0.5 transition-colors">{t('quest.undo')}</button>
                   )}
                 </div>
 
@@ -140,7 +142,7 @@ export const TaskBoard = memo(function TaskBoard({ task, onCompleteSubtask, onSt
                   {!sub.completed && sub.unlocked && !sub.isBoss && onStartPomodoro && (
                     <button onClick={e => { e.stopPropagation(); onStartPomodoro(sub.id) }}
                       className="px-2 py-1 text-[10px] rounded-lg bg-[hsl(var(--gold)/0.1)] text-[hsl(var(--gold))] hover:bg-[hsl(var(--gold)/0.2)] transition-colors font-medium">
-                      Focus
+                      {t('quest.focus')}
                     </button>
                   )}
                   <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
@@ -178,7 +180,7 @@ export const TaskBoard = memo(function TaskBoard({ task, onCompleteSubtask, onSt
       {/* Completed Footer */}
       {allCompleted && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="px-5 pb-5 pt-2 text-center space-y-2">
-          <p className="text-emerald-400 font-semibold text-[15px]">Quest Complete 🎉</p>
+          <p className="text-emerald-400 font-semibold text-[15px]">{t('quest.complete')}</p>
           {onFuneral && (
             <button onClick={onFuneral}
               className="text-[11px] text-muted-foreground/60 hover:text-foreground transition-colors">

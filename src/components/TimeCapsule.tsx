@@ -1,3 +1,4 @@
+import { useT } from '../lib/i18n.tsx'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Mic, Send, SkipForward, Clock } from 'lucide-react'
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function TimeCapsuleModal({ taskName, onDone, onSkip }: Props) {
+  const { t } = useT()
   const [message, setMessage] = useState('')
   const [recording, setRecording] = useState(false)
 
@@ -30,20 +32,20 @@ export function TimeCapsuleModal({ taskName, onDone, onSkip }: Props) {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
               <Clock className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="text-xl font-bold mb-2">📦 时光胶囊</h2>
+            <h2 className="text-xl font-bold mb-2">{t('capsule.titleFull')}</h2>
             <p className="text-muted-foreground text-sm">
-              给未来的自己留一段话——当你摆烂时，来自现在的你会劝你回来
+              {t('capsule.desc')}
             </p>
           </div>
 
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">
-              我为什么要搞定「{taskName}」？
+              {t('capsule.question')}「{taskName}」？
             </label>
             <textarea
               value={message}
               onChange={e => setMessage(e.target.value)}
-              placeholder="比如：搞完这篇论文我就可以安心去旅行了..."
+              placeholder="{t('capsule.placeholder')}"
               rows={4}
               className="w-full px-4 py-3 rounded-xl bg-secondary border border-border focus:border-primary focus:outline-none resize-none text-sm transition-colors"
               autoFocus
@@ -57,14 +59,14 @@ export function TimeCapsuleModal({ taskName, onDone, onSkip }: Props) {
               className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               <Send className="w-4 h-4" />
-              封存胶囊
+              {t('capsule.seal')}
             </button>
             <button
               onClick={onSkip}
               className="flex items-center gap-2 px-4 py-3 border border-border rounded-xl hover:bg-secondary transition-colors text-sm text-muted-foreground"
             >
               <SkipForward className="w-4 h-4" />
-              跳过
+              {t('capsule.skip')}
             </button>
           </div>
         </div>

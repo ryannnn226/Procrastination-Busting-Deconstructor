@@ -1,3 +1,4 @@
+import { useT } from '../lib/i18n.tsx'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { negotiateStay } from '../lib/ai'
@@ -17,6 +18,7 @@ interface Message {
 }
 
 export function NegotiateDialog({ taskName, personality, onStay, onClose }: Props) {
+  const { t, lang } = useT()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [round, setRound] = useState(1)
@@ -25,12 +27,12 @@ export function NegotiateDialog({ taskName, personality, onStay, onClose }: Prop
 
   useEffect(() => {
     setMessages([
-      { role: 'ai', content: '等等！我感觉你想跑路...发生什么了？👀' }
+      { role: 'ai', content: t('negotiate.greeting') }
     ])
   }, [])
 
   const handleSend = async (reason?: string) => {
-    const userMsg = reason || input || '就是不想做了'
+    const userMsg = reason || input || t('negotiate.defaultReason')
     if (!reason && !input.trim()) return
 
     const newMessages: Message[] = [
@@ -44,7 +46,7 @@ export function NegotiateDialog({ taskName, personality, onStay, onClose }: Prop
     const reply = await negotiateStay(taskName, personality, userMsg, round)
 
     // Check if user agreed to stay
-    if (reply.includes('(达成') || round >= 5 || userMsg.includes('好') || userMsg.includes('行')) {
+    if (reply.includes(lang === 'zh' ? '(达成' : '(Agreed') || round >= 5 || userMsg.includes(lang === 'zh' ? '好' : 'ok') || userMsg.includes(lang === 'zh' ? '行' : 'yes')) {
       setMessages([...newMessages, { role: 'ai', content: reply.replace(/\(.*?\)/g, '').trim() }])
       setTimeout(() => {
         setResolved(true)
@@ -57,7 +59,7 @@ export function NegotiateDialog({ taskName, personality, onStay, onClose }: Prop
     setLoading(false)
   }
 
-  const quickReasons = ['太难了', '没动力', '有别的事', '累了']
+  const quickReasons = [t('negotiate.reasons.tooHard'), t('negotiate.reasons.noMotivation'), t('negotiate.reasons.otherStuff'), t('negotiate.reasons.tired')]
 
   if (resolved) {
     return (
@@ -68,8 +70,8 @@ export function NegotiateDialog({ taskName, personality, onStay, onClose }: Prop
           className="bg-card rounded-2xl p-8 max-w-sm w-full text-center border border-emerald-500/30"
         >
           <p className="text-4xl mb-4">🤝</p>
-          <h3 className="text-xl font-bold text-emerald-400 mb-2">谈判成功！</h3>
-          <p className="text-muted-foreground text-sm">回来继续战斗吧，你可以的 💪</p>
+          <h3 className="text-xl font-bold text-emerald-400 mb-2">{t('negotiate.success')}</h3>
+          <p className="text-muted-foreground text-sm">{t('negotiate.comeback')}</p>
         </motion.div>
       </div>
     )
@@ -86,7 +88,7 @@ export function NegotiateDialog({ taskName, personality, onStay, onClose }: Prop
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-2">
             <MessageCircle className="w-5 h-5 text-primary" />
-            <h3 className="font-semibold">AI 拉扯谈判</h3>
+            <h3 className="font-semibold">{t('negotiate.title')}</h3>
           </div>
           <button onClick={onClose} className="p-1 hover:bg-secondary rounded-lg transition-colors">
             <X className="w-4 h-4" />
@@ -149,7 +151,7 @@ export function NegotiateDialog({ taskName, personality, onStay, onClose }: Prop
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder="说说你的想法..."
+              placeholder="{t('negotiate.placeholder')}"
               className="flex-1 px-3 py-2 rounded-xl bg-secondary border border-border focus:border-primary focus:outline-none text-sm"
               disabled={loading}
             />

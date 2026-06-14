@@ -1,3 +1,4 @@
+import { useT } from '../lib/i18n.tsx'
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Task } from '../lib/types'
@@ -10,21 +11,22 @@ interface Props {
   onRetreat: () => void
 }
 
-const BOSS_NAMES = ['拖延巨兽', '摆烂魔龙', '摸鱼大魔王', '死线收割者', '空白页噩梦']
+const getBossNames = (t: (k: string) => string) => [t('boss.name1'), t('boss.name2'), t('boss.name3'), t('boss.name4'), t('boss.name5')]
 
 export function BossBattle({ task, onDefeated, onRetreat }: Props) {
+  const { t, lang } = useT()
   const [phase, setPhase] = useState<'intro' | 'battle' | 'victory'>('intro')
   const [bossHp, setBossHp] = useState(100)
   const [playerHp, setPlayerHp] = useState(100)
   const [timer, setTimer] = useState(25 * 60) // 25 min
   const [started, setStarted] = useState(false)
   const [encouragement, setEncouragement] = useState('')
-  const [bossName] = useState(() => BOSS_NAMES[Math.floor(Math.random() * BOSS_NAMES.length)])
+  const [bossName] = useState(() => getBossNames(t)[Math.floor(Math.random() * 5)])
   const [showConfetti, setShowConfetti] = useState(false)
   const [hitEffect, setHitEffect] = useState<'player' | 'boss' | null>(null)
 
   useEffect(() => {
-    bossEncouragement(task.name).then(setEncouragement)
+    bossEncouragement(task.name, lang).then(setEncouragement)
   }, [task.name])
 
   useEffect(() => {
@@ -111,13 +113,13 @@ export function BossBattle({ task, onDefeated, onRetreat }: Props) {
           </motion.div>
 
           <h2 className="text-3xl font-black mb-2 text-red-500">
-            ⚔️ Boss 战 ⚔️
+            {t('boss.title')}
           </h2>
           <p className="text-xl font-bold mb-1">
             VS <span className="text-red-400">{bossName}</span>
           </p>
           <p className="text-muted-foreground text-sm mb-2">
-            最终关卡：{task.subtasks.find(s => s.isBoss)?.title}
+            {t('boss.finalQuest')}：{task.subtasks.find(s => s.isBoss)?.title}
           </p>
 
           {encouragement && (
@@ -137,13 +139,13 @@ export function BossBattle({ task, onDefeated, onRetreat }: Props) {
               onClick={handleAttack}
               className="px-8 py-4 bg-red-600 text-white rounded-2xl font-black text-lg hover:bg-red-500 transition-colors shadow-lg shadow-red-600/30"
             >
-              ⚔️ 开战！
+              {t('boss.fight')}
             </motion.button>
             <button
               onClick={onRetreat}
               className="px-6 py-4 border border-border rounded-2xl text-muted-foreground hover:bg-secondary transition-colors"
             >
-              🏃 撤退
+              {t('boss.retreat')}
             </button>
           </div>
         </motion.div>
@@ -199,7 +201,7 @@ export function BossBattle({ task, onDefeated, onRetreat }: Props) {
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Shield className="w-5 h-5 text-blue-400" />
-                <span className="font-bold text-blue-400">你</span>
+                <span className="font-bold text-blue-400">{t('boss.you')}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Heart className={`w-4 h-4 ${playerHp < 30 ? 'text-red-400 animate-pulse' : 'text-red-400'}`} />
@@ -224,7 +226,7 @@ export function BossBattle({ task, onDefeated, onRetreat }: Props) {
             className="w-full py-5 bg-red-600 text-white rounded-2xl font-black text-xl hover:bg-red-500 transition-colors shadow-lg shadow-red-600/30 flex items-center justify-center gap-3"
           >
             <Sword className="w-6 h-6" />
-            攻击！
+            {t('boss.attack')}
           </motion.button>
 
           {/* Retreat */}
@@ -232,7 +234,7 @@ export function BossBattle({ task, onDefeated, onRetreat }: Props) {
             onClick={onRetreat}
             className="w-full mt-3 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            撤退（任务不会失败，但Boss还在等你）
+            {t('boss.retreatMsg')}
           </button>
         </motion.div>
       )}
@@ -252,11 +254,11 @@ export function BossBattle({ task, onDefeated, onRetreat }: Props) {
             🎉
           </motion.div>
           <h2 className="text-3xl font-black text-yellow-400 mb-2">
-            Boss 击败！
+            {t('boss.defeated')}
           </h2>
-          <p className="text-xl font-bold mb-1">{bossName} 已被打败</p>
+          <p className="text-xl font-bold mb-1">{bossName} {t('boss.defeatedMsg')}</p>
           <p className="text-muted-foreground text-sm mb-4">
-            恭喜！你战胜了拖延，完成了「{task.name}」
+            {t('boss.congrats')}「{task.name}」
           </p>
 
           {/* Confetti Particles */}

@@ -1,4 +1,6 @@
 
+import { useT } from '../lib/i18n.tsx'
+import { useToast } from '../lib/toast.tsx'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { loadShop, saveShop, getAvailablePoints, spendPoints, getTransactions, getTotalEarned, getTotalSpent, getCheckinStatus, doCheckin, addRedemption, getPendingRedemptions, getUsedRedemptions, useRedemption, Redemption } from '../lib/shop'
@@ -11,6 +13,10 @@ type TabType = 'shop' | 'pending' | 'used' | 'history' | 'stats'
 const EMOJIS = ['🎯', '🏆', '🎨', '📚', '✈️', '🍕', '🎵', '💆', '🎪', '🌸']
 
 export function ShopPanel({ onClose }: Props) {
+  const { t, lang } = useT();
+  const itemName = (item: { id: string; name: string }) => item.id.startsWith('custom-') ? item.name : t('shop.item.' + item.id + '.name');
+  const itemDesc = (item: { id: string; description: string }) => item.id.startsWith('custom-') ? item.description : t('shop.item.' + item.id + '.desc')
+  const { showToast } = useToast()
   const [items, setItems] = useState<ShopItem[]>([])
   const [points, setPoints] = useState(0)
   const [redeeming, setRedeeming] = useState<string | null>(null)
@@ -33,9 +39,10 @@ export function ShopPanel({ onClose }: Props) {
     if (points < item.cost) return
     setRedeeming(item.id)
     setTimeout(() => {
-      if (spendPoints(item.cost, item.name)) {
+      if (spendPoints(item.cost, itemName(item))) {
         addRedemption(item)
-        setShowSuccess(item.emoji + ' ' + item.name)
+        showToast(item.emoji + ' ' + itemName(item), 'success', '-' + item.cost + ' ⭐')
+        setShowSuccess(item.emoji + ' ' + itemName(item))
         refresh()
         setTimeout(() => setShowSuccess(''), 2500)
       }
@@ -50,7 +57,7 @@ export function ShopPanel({ onClose }: Props) {
 
   const handleAddItem = () => {
     if (!newItem.name.trim()) return
-    const item: ShopItem = { id: 'custom-' + Date.now(), name: newItem.name.trim(), description: '自定义奖励', cost: newItem.cost, emoji: newItem.emoji, redeemed: false }
+    const item: ShopItem = { id: 'custom-' + Date.now(), name: newItem.name.trim(), description: t('shop.customLabel'), cost: newItem.cost, emoji: newItem.emoji, redeemed: false }
     const updated = [...items, item]; setItems(updated); saveShop(updated)
     setNewItem({ name: '', cost: 50, emoji: '🎯' }); setShowAddItem(false)
   }
@@ -74,11 +81,11 @@ export function ShopPanel({ onClose }: Props) {
   const totalSpent = getTotalSpent()
 
   const TABS: [TabType, string, number?][] = [
-    ['shop', '商城'],
-    ['pending', '待使用', pending.length],
-    ['used', '已使用'],
-    ['history', '明细'],
-    ['stats', '统计'],
+    ['shop', t('shop.title')],
+    ['pending', t('shop.pending'), pending.length],
+    ['used', t('shop.used')],
+    ['history', t('shop.history')],
+    ['stats', t('shop.stats')],
   ]
 
   return (
@@ -88,24 +95,24 @@ export function ShopPanel({ onClose }: Props) {
 
         <div className="p-5 border-b border-border shrink-0">
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2"><Store className="w-5 h-5 text-primary" /><h2 className="text-lg font-bold">积分商城</h2></div>
-            <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">关闭 ✕</button>
+            <div className="flex items-center gap-2"><Store className="w-5 h-5 text-primary" /><h2 className="text-lg font-bold">{t('shop.title')}</h2></div>
+            <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">{t('shop.close')}</button>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex-1 flex items-center gap-3 p-3 rounded-xl bg-primary/10 border border-primary/20">
               <Coins className="w-6 h-6 text-yellow-400" />
-              <div><p className="text-2xl font-black text-yellow-400">{points}</p><p className="text-xs text-muted-foreground">可用积分</p></div>
+              <div><p className="text-2xl font-black text-yellow-400">{points}</p><p className="text-xs text-muted-foreground">{t('shop.available')}</p></div>
             </div>
             <button onClick={handleCheckin} disabled={checkinDone}
               className={'shrink-0 p-3 rounded-xl border text-center transition-all ' + (checkinDone ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-border hover:border-primary/50')}>
               <Calendar className={'w-5 h-5 mx-auto mb-0.5 ' + (checkinDone ? 'text-emerald-400' : 'text-muted-foreground')} />
-              <span className="text-[10px]">{checkinDone ? '已签到' : '签到'}</span>
+              <span className="text-[10px]">{checkinDone ? t('shop.checkedIn') : t('shop.checkin')}</span>
             </button>
           </div>
           {checkinResult && (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
               className="mt-2 p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-center text-sm text-yellow-400">
-              🎉 签到成功！+{checkinResult.points} 积分 | 连续 {checkinResult.streak} 天
+              {t('shop.checkinSuccess')}+{checkinResult.points} {t('shop.pointsUnit')} | {t('shop.streakDays', String(checkinResult.streak))}
             </motion.div>
           )}
         </div>
@@ -131,8 +138,8 @@ export function ShopPanel({ onClose }: Props) {
                       className={'flex items-center gap-3 p-4 rounded-xl border transition-all ' + (canAfford ? 'border-border hover:border-primary/50 cursor-pointer' : 'border-border opacity-40')}>
                       <span className="text-2xl shrink-0">{item.emoji}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">{item.description}</p>
+                        <p className="font-medium text-sm">{itemName(item)}</p>
+                        <p className="text-xs text-muted-foreground">{itemDesc(item)}</p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {item.id.startsWith('custom-') && (
@@ -140,9 +147,9 @@ export function ShopPanel({ onClose }: Props) {
                         )}
                         <div className="text-right">
                           <p className={'text-sm font-bold ' + (canAfford ? 'text-yellow-400' : 'text-muted-foreground')}>{item.cost} ⭐</p>
-                          {redeeming === item.id ? <span className="text-[10px] text-muted-foreground">兑换中...</span>
-                            : canAfford ? <span className="text-[10px] text-primary">点击兑换</span>
-                            : <span className="text-[10px] text-muted-foreground">积分不足</span>}
+                          {redeeming === item.id ? <span className="text-[10px] text-muted-foreground">{t('shop.redeeming')}</span>
+                            : canAfford ? <span className="text-[10px] text-primary">{t('shop.clickRedeem')}</span>
+                            : <span className="text-[10px] text-muted-foreground">{t('shop.notEnough')}</span>}
                         </div>
                       </div>
                     </motion.div>
@@ -156,17 +163,17 @@ export function ShopPanel({ onClose }: Props) {
                     ))}</div>
                     <div className="flex gap-2">
                       <input value={newItem.name} onChange={e => setNewItem({ ...newItem, name: e.target.value })}
-                        placeholder="奖励名称" className="flex-1 px-3 py-2 text-sm rounded-lg bg-secondary border border-border focus:border-primary focus:outline-none" />
+                        placeholder="{t('shop.rewardNamePlaceholder')}" className="flex-1 px-3 py-2 text-sm rounded-lg bg-secondary border border-border focus:border-primary focus:outline-none" />
                       <input type="number" value={newItem.cost} onChange={e => setNewItem({ ...newItem, cost: Number(e.target.value) || 10 })}
                         className="w-20 px-2 py-2 text-sm rounded-lg bg-secondary border border-border" min={10} max={999} />
-                      <button onClick={handleAddItem} className="px-3 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium">添加</button>
+                      <button onClick={handleAddItem} className="px-3 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium">{t('shop.add')}</button>
                     </div>
-                    <button onClick={() => setShowAddItem(false)} className="text-xs text-muted-foreground hover:text-foreground">取消</button>
+                    <button onClick={() => setShowAddItem(false)} className="text-xs text-muted-foreground hover:text-foreground">{t('common.cancel')}</button>
                   </motion.div>
                 ) : (
                   <button onClick={() => setShowAddItem(true)}
                     className="w-full py-3 border border-dashed border-border rounded-xl text-sm text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors flex items-center justify-center gap-1.5">
-                    <Plus className="w-4 h-4" />自定义奖励
+                    <Plus className="w-4 h-4" />{t('shop.addCustomReward')}
                   </button>
                 )}
               </motion.div>
@@ -175,23 +182,23 @@ export function ShopPanel({ onClose }: Props) {
             {tab === 'pending' && (
               <motion.div key="pending" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
                 {pending.length === 0 ? (
-                  <p className="text-center text-muted-foreground text-sm py-8">暂无待使用的奖励，去商城兑换吧～</p>
+                  <p className="text-center text-muted-foreground text-sm py-8">{t('shop.emptyPending')}</p>
                 ) : (
                   pending.map(r => (
                     <motion.div key={r.id} className="flex items-center gap-3 p-4 rounded-xl border border-yellow-500/30 bg-yellow-500/5">
                       <span className="text-2xl shrink-0">{r.itemEmoji}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-sm">{r.itemName}</p>
+                          <p className="font-medium text-sm">{r.itemId && r.itemId.startsWith('custom-') ? r.itemName : t('shop.item.' + r.itemId + '.name')}</p>
                           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400 flex items-center gap-0.5">
-                            <Clock className="w-2.5 h-2.5" />待使用
+                            <Clock className="w-2.5 h-2.5" />{t('shop.pending')}
                           </span>
                         </div>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">兑换于 {new Date(r.redeemedAt).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })} · {r.cost} ⭐</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{t('shop.redeemedAt')} {new Date(r.redeemedAt).toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en', { month: 'short', day: 'numeric' })} · {r.cost} ⭐</p>
                       </div>
                       <button onClick={() => handleUseReward(r.id)}
                         className="shrink-0 px-3 py-1.5 bg-yellow-500/20 text-yellow-400 rounded-lg text-xs font-medium hover:bg-yellow-500/30 transition-colors">
-                        使用 ✓
+                        {t('shop.useIt')}
                       </button>
                     </motion.div>
                   ))
@@ -202,20 +209,20 @@ export function ShopPanel({ onClose }: Props) {
             {tab === 'used' && (
               <motion.div key="used" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
                 {used.length === 0 ? (
-                  <p className="text-center text-muted-foreground text-sm py-8">暂无已使用的奖励</p>
+                  <p className="text-center text-muted-foreground text-sm py-8">{t('shop.emptyUsed')}</p>
                 ) : (
                   used.map(r => (
                     <div key={r.id} className="flex items-center gap-3 p-4 rounded-xl border border-border bg-[hsl(var(--muted))]/30 opacity-60">
                       <span className="text-2xl shrink-0">{r.itemEmoji}</span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-sm">{r.itemName}</p>
+                          <p className="font-medium text-sm">{r.itemId && r.itemId.startsWith('custom-') ? r.itemName : t('shop.item.' + r.itemId + '.name')}</p>
                           <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center gap-0.5">
-                            <CheckCircle className="w-2.5 h-2.5" />已使用
+                            <CheckCircle className="w-2.5 h-2.5" />{t('shop.used')}
                           </span>
                         </div>
                         <p className="text-[10px] text-muted-foreground mt-0.5">
-                          {r.usedAt ? '使用于 ' + new Date(r.usedAt).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' }) : ''} · {r.cost} ⭐
+                          {r.usedAt ? t('shop.usedAt') + ' ' + new Date(r.usedAt).toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en', { month: 'short', day: 'numeric' }) : ''} · {r.cost} ⭐
                         </p>
                       </div>
                     </div>
@@ -227,14 +234,14 @@ export function ShopPanel({ onClose }: Props) {
             {tab === 'history' && (
               <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
                 {transactions.length === 0 ? (
-                  <p className="text-center text-muted-foreground text-sm py-8">暂无积分记录</p>
+                  <p className="text-center text-muted-foreground text-sm py-8">{t('shop.emptyHistory')}</p>
                 ) : (
                   transactions.map(tx => (
                     <div key={tx.id} className="flex items-center gap-3 p-3 rounded-xl bg-[hsl(var(--muted))]/40">
                       {tx.type === 'earn' ? <TrendingUp className="w-4 h-4 text-emerald-400" /> : tx.type === 'checkin' ? <Gift className="w-4 h-4 text-yellow-400" /> : <TrendingDown className="w-4 h-4 text-red-400" />}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm truncate">{tx.reason}</p>
-                        <p className="text-[10px] text-muted-foreground">{new Date(tx.time).toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                        <p className="text-sm truncate">{tx.reason === 'quest_reward' ? t('shop.reason.taskReward') : tx.reason === 'shop_redeem' ? t('shop.reason.shopRedeem') : tx.reason === 'daily_checkin' ? t('shop.reason.dailyCheckin') : tx.reason}</p>
+                        <p className="text-[10px] text-muted-foreground">{new Date(tx.time).toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                       </div>
                       <span className={'font-mono font-bold text-sm ' + (tx.amount > 0 ? 'text-emerald-400' : 'text-red-400')}>{tx.amount > 0 ? '+' : ''}{tx.amount}</span>
                     </div>
@@ -249,18 +256,18 @@ export function ShopPanel({ onClose }: Props) {
                   <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center">
                     <TrendingUp className="w-5 h-5 mx-auto mb-2 text-emerald-400" />
                     <p className="text-2xl font-black text-emerald-400">{totalEarned}</p>
-                    <p className="text-xs text-muted-foreground">累计赚取</p>
+                    <p className="text-xs text-muted-foreground">{t('shop.totalEarned')}</p>
                   </div>
                   <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-center">
                     <TrendingDown className="w-5 h-5 mx-auto mb-2 text-red-400" />
                     <p className="text-2xl font-black text-red-400">{totalSpent}</p>
-                    <p className="text-xs text-muted-foreground">累计消费</p>
+                    <p className="text-xs text-muted-foreground">{t('shop.totalSpent')}</p>
                   </div>
                 </div>
                 <div className="p-4 rounded-xl bg-secondary/30 text-center">
                   <Coins className="w-5 h-5 mx-auto mb-2 text-yellow-400" />
                   <p className="text-2xl font-black text-yellow-400">{points}</p>
-                  <p className="text-xs text-muted-foreground">当前余额</p>
+                  <p className="text-xs text-muted-foreground">{t('shop.currentBalance')}</p>
                 </div>
               </motion.div>
             )}
@@ -272,7 +279,7 @@ export function ShopPanel({ onClose }: Props) {
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
               className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center gap-3">
               <Sparkles className="w-5 h-5 text-emerald-400" />
-              <div><p className="text-sm font-semibold text-emerald-400">兑换成功！</p><p className="text-xs text-emerald-400/70">{showSuccess} — 尽情享受！</p></div>
+              <div><p className="text-sm font-semibold text-emerald-400">{t('shop.redeemedOk')}</p><p className="text-xs text-emerald-400/70">{showSuccess} — {t('shop.enjoy')}</p></div>
             </motion.div>
           )}
         </AnimatePresence>

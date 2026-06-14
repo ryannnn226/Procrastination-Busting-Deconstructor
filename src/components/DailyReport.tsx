@@ -1,3 +1,4 @@
+import { useT } from '../lib/i18n.tsx'
 import { useState, useEffect, useMemo, memo } from 'react'
 import { motion } from 'framer-motion'
 import { Task, ProcrastinationPoint } from '../lib/types'
@@ -6,17 +7,18 @@ import { Calendar, Clock, TrendingDown, Award, BarChart3 } from 'lucide-react'
 
 interface Props { tasks: Task[] }
 
-const DAY_LABELS = ['日', '一', '二', '三', '四', '五', '六']
+const getDayLabels = (t: (k: string) => string) => [t('day.sun'), t('day.mon'), t('day.tue'), t('day.wed'), t('day.thu'), t('day.fri'), t('day.sat')]
 const HOUR_LABELS = ['0', '2', '4', '6', '8', '10', '12', '14', '16', '18', '20', '22']
 
 export const DailyReport = memo(function DailyReport({ tasks }: Props) {
+  const { t, lang } = useT()
   const [heatmap, setHeatmap] = useState<ProcrastinationPoint[]>([])
   const [showReport, setShowReport] = useState(false)
 
   useEffect(() => { setHeatmap(loadHeatmap()) }, [])
 
   const today = new Date()
-  const todayStr = today.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' })
+  const todayStr = today.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', { month: 'long', day: 'numeric', weekday: 'long' })
   const totalCompletedToday = tasks.reduce((sum, t) => sum + t.subtasks.filter(s => s.completed).length, 0)
   const totalSlackOffs = tasks.length > 0 ? Math.max(1, Math.floor(Math.random() * 5)) : 0
 
@@ -59,7 +61,7 @@ export const DailyReport = memo(function DailyReport({ tasks }: Props) {
         className="w-full flex items-center justify-between p-4 rounded-xl border border-border bg-card hover:border-primary/50 transition-colors">
         <div className="flex items-center gap-3">
           <BarChart3 className="w-5 h-5 text-primary" />
-          <div className="text-left"><p className="font-semibold text-sm">拖延改善成绩单</p><p className="text-xs text-muted-foreground">{todayStr}</p></div>
+          <div className="text-left"><p className="font-semibold text-sm">{t('report.title')}</p><p className="text-xs text-muted-foreground">{todayStr}</p></div>
         </div>
         <motion.div animate={{ rotate: showReport ? 180 : 0 }} className="text-muted-foreground">▼</motion.div>
       </button>
@@ -69,40 +71,40 @@ export const DailyReport = memo(function DailyReport({ tasks }: Props) {
           <div className="mt-3 p-5 rounded-xl border border-border bg-card space-y-5">
             <div className="grid grid-cols-2 gap-3">
               <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                <div className="flex items-center gap-1.5 mb-1"><Award className="w-4 h-4 text-emerald-400" /><span className="text-xs text-emerald-400 font-medium">今日完成</span></div>
-                <p className="text-2xl font-bold font-mono">{totalCompletedToday}</p><p className="text-xs text-muted-foreground">个小关卡</p>
+                <div className="flex items-center gap-1.5 mb-1"><Award className="w-4 h-4 text-emerald-400" /><span className="text-xs text-emerald-400 font-medium">{t('report.todayDone')}</span></div>
+                <p className="text-2xl font-bold font-mono">{totalCompletedToday}</p><p className="text-xs text-muted-foreground">{t('report.subtasks')}</p>
               </div>
               <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                <div className="flex items-center gap-1.5 mb-1"><TrendingDown className="w-4 h-4 text-red-400" /><span className="text-xs text-red-400 font-medium">摆烂次数</span></div>
-                <p className="text-2xl font-bold font-mono">{totalSlackOffs}</p><p className="text-xs text-muted-foreground">次想放弃</p>
+                <div className="flex items-center gap-1.5 mb-1"><TrendingDown className="w-4 h-4 text-red-400" /><span className="text-xs text-red-400 font-medium">{t('report.slackCount')}</span></div>
+                <p className="text-2xl font-bold font-mono">{totalSlackOffs}</p><p className="text-xs text-muted-foreground">{t('report.slackDesc')}</p>
               </div>
             </div>
 
             <div className="p-3 rounded-lg bg-[hsl(var(--muted))]/60 flex items-center gap-3">
               <Clock className="w-5 h-5 text-yellow-400 shrink-0" />
               <div>
-                <p className="text-sm font-medium">最容易摆烂时段</p>
+                <p className="text-sm font-medium">{t('report.worstTime')}</p>
                 <p className="text-lg font-bold text-yellow-400">{peakHour}:00 - {peakHour + 2}:00</p>
-                <p className="text-xs text-muted-foreground mt-0.5">建议这个时段安排最简单的关卡 🎯</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{t('report.worstTip')}</p>
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-muted-foreground">7×24 摆烂热力图</span>
+                <span className="text-xs font-medium text-muted-foreground">{t('report.heatmap')}</span>
                 <div className="flex items-center gap-1">
-                  <span className="text-[10px] text-muted-foreground">低</span>
+                  <span className="text-[10px] text-muted-foreground">{t('report.low')}</span>
                   {[1, 3, 5, 7, 9].map(l => <div key={l} className={`w-3 h-3 rounded-sm ${getHeatColor(l)}`} />)}
-                  <span className="text-[10px] text-muted-foreground">高</span>
+                  <span className="text-[10px] text-muted-foreground">{t('report.high')}</span>
                 </div>
               </div>
               <div className="flex mb-1 ml-8">{HOUR_LABELS.map(h => <span key={h} className="flex-1 text-[9px] text-muted-foreground text-center">{h}</span>)}</div>
               <div className="space-y-0.5">
                 {heatmapGrid.map((row, dayIdx) => (
                   <div key={dayIdx} className="flex items-center gap-1">
-                    <span className="w-6 text-[10px] text-muted-foreground text-right shrink-0">{DAY_LABELS[dayIdx]}</span>
+                    <span className="w-6 text-[10px] text-muted-foreground text-right shrink-0">{getDayLabels(t)[dayIdx]}</span>
                     <div className="flex gap-0.5 flex-1">
-                      {row.map((level, hourIdx) => <div key={hourIdx} className={`flex-1 h-4 rounded-sm ${getHeatColor(level)}`} title={`${DAY_LABELS[dayIdx]} ${hourIdx}:00 - 摆烂指数: ${level}/10`} />)}
+                      {row.map((level, hourIdx) => <div key={hourIdx} className={`flex-1 h-4 rounded-sm ${getHeatColor(level)}`} title={`${getDayLabels(t)[dayIdx]} ${hourIdx}:00 - {t('report.slackLevel')}: ${level}/10`} />)}
                     </div>
                   </div>
                 ))}
@@ -111,9 +113,9 @@ export const DailyReport = memo(function DailyReport({ tasks }: Props) {
 
             <div className="p-3 rounded-lg border border-border bg-secondary/30">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                💡 <span className="font-medium text-foreground/80">AI 分析：</span>
-                你在 <span className="text-yellow-400 font-medium">{peakHour}:00</span> 前后最容易摆烂，连续打卡 <span className="text-emerald-400 font-medium">{streak}</span> 天。
-                {streak >= 3 ? ' 势头不错！' : ' 试试用AI拉扯谈判度过困难时段 💪'}
+                💡 <span className="font-medium text-foreground/80">{t('report.aiAnalysis')}</span>
+                {t('report.youSlack')}<span className="text-yellow-400 font-medium">{peakHour}:00</span> {t('report.streakMsg')} <span className="text-emerald-400 font-medium">{streak}</span>{t('report.days')}
+                {streak >= 3 ? t('report.momentum') : t('report.tryNegotiate')}
               </p>
             </div>
           </div>

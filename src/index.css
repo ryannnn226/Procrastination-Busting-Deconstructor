@@ -176,3 +176,14 @@ body::before {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground) / 0.3); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.5); }
+
+/* Gold native date picker icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(85%) sepia(40%) saturate(1200%) hue-rotate(355deg) brightness(1.05);
+  cursor: pointer;
+  opacity: 0.85;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  filter: invert(85%) sepia(40%) saturate(1400%) hue-rotate(355deg) brightness(1.1);
+}

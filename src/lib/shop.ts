@@ -40,14 +40,14 @@ export function getAvailablePoints(): number { return parseInt(localStorage.getI
 
 export function addPoints(amount: number, reason?: string): number {
   const cur = getAvailablePoints(); localStorage.setItem(POINTS_KEY, String(cur + amount))
-  addTransaction({ id: 'tx-' + Date.now(), type: 'earn', amount, reason: reason || '任务奖励', time: new Date().toISOString() })
+  addTransaction({ id: 'tx-' + Date.now(), type: 'earn', amount, reason: reason || 'quest_reward', time: new Date().toISOString() })
   return cur + amount
 }
 
 export function spendPoints(amount: number, reason?: string): boolean {
   const cur = getAvailablePoints(); if (cur < amount) return false
   localStorage.setItem(POINTS_KEY, String(cur - amount))
-  addTransaction({ id: 'tx-' + Date.now(), type: 'spend', amount: -amount, reason: reason || '商城兑换', time: new Date().toISOString() })
+  addTransaction({ id: 'tx-' + Date.now(), type: 'spend', amount: -amount, reason: reason || 'shop_redeem', time: new Date().toISOString() })
   return true
 }
 
@@ -73,7 +73,7 @@ export function doCheckin(): { points: number; streak: number } {
   const points = 5 + Math.floor(Math.random() * 11); const today = new Date().toISOString().slice(0, 10)
   const s = getCheckinStatus(); const newStreak = s.checked ? s.streak : s.streak + 1
   localStorage.setItem(CHECKIN_KEY, JSON.stringify({ date: today, streak: newStreak }))
-  addPoints(points, '每日签到'); return { points, streak: newStreak }
+  addPoints(points, 'daily_checkin'); return { points, streak: newStreak }
 }
 
 // Redemption tracking

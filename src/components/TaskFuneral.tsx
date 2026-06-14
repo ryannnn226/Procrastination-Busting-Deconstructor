@@ -1,4 +1,5 @@
-﻿import { useState, useEffect } from 'react'
+﻿import { useT } from '../lib/i18n.tsx'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Task } from '../lib/types'
 import { chat } from '../lib/deepseek'
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function TaskFuneral({ task, onClose }: Props) {
+  const { t, lang } = useT()
   const [eulogy, setEulogy] = useState('')
   const [phase, setPhase] = useState<'ceremony' | 'destroy' | 'done'>('ceremony')
 
@@ -19,14 +21,14 @@ export function TaskFuneral({ task, onClose }: Props) {
 
   const generateEulogy = async () => {
     const stats = [
-      `总子任务：${task.subtasks.length} 个`,
-      `人格类型：${task.personality}`,
-      `截止日期：${task.deadline}`,
+      `${t('funeral.totalSubtasks')}${task.subtasks.length}`,
+      `${t('funeral.personalityType')}${task.personality}`,
+      `${t('funeral.deadline')}${task.deadline}`,
     ].join('，')
 
-    const prompt = `用户刚刚完成了任务"${task.name}"！写一段 80 字以内的诙谐悼词/告别词，用幽默的语气悼念"拖延"的死亡，庆祝任务的完成。风格轻松有趣。第二人称。`
+    const prompt = lang === 'en' ? `The user just completed "${task.name}"! Write a funny eulogy under 80 words, humorously mourning the death of "procrastination", celebrating task completion. Light and fun tone. Second person.` : `用户刚刚完成了任务"${task.name}"！写一段 80 字以内的诙谐悼词/告别词，用幽默的语气悼念"拖延"的死亡，庆祝任务的完成。风格轻松有趣。第二人称。`
     const result = await chat([{ role: 'user', content: prompt }])
-    setEulogy(result || `${task.name} 终于被你打败了！拖延兽已阵亡。`)
+    setEulogy(result || `${task.name} {t('funeral.defeatedDefault')}`)
   }
 
   const totalMinutes = task.subtasks.reduce((sum, s) => sum + s.duration, 0)
@@ -57,9 +59,9 @@ export function TaskFuneral({ task, onClose }: Props) {
               >
                 ⚰️
               </motion.div>
-              <h2 className="text-xl font-bold mb-1">任务葬礼</h2>
+              <h2 className="text-xl font-bold mb-1">{t('funeral.title')}</h2>
               <p className="text-sm text-muted-foreground">
-                「{task.name}」— 安息吧，拖延！
+                「{task.name}」— {t('funeral.restInPeace')}
               </p>
             </div>
 
@@ -68,15 +70,15 @@ export function TaskFuneral({ task, onClose }: Props) {
               <div className="grid grid-cols-3 gap-3 mb-4">
                 <div className="text-center p-2 rounded-lg bg-secondary/50">
                   <p className="text-lg font-bold font-mono">{task.subtasks.length}</p>
-                  <p className="text-[10px] text-muted-foreground">关卡数</p>
+                  <p className="text-[10px] text-muted-foreground">{t('funeral.stats')}</p>
                 </div>
                 <div className="text-center p-2 rounded-lg bg-secondary/50">
                   <p className="text-lg font-bold font-mono">{totalMinutes}</p>
-                  <p className="text-[10px] text-muted-foreground">总分钟</p>
+                  <p className="text-[10px] text-muted-foreground">{t('funeral.totalMin')}</p>
                 </div>
                 <div className="text-center p-2 rounded-lg bg-secondary/50">
                   <p className="text-lg font-bold font-mono">{task.streak || '?'}</p>
-                  <p className="text-[10px] text-muted-foreground">连胜天</p>
+                  <p className="text-[10px] text-muted-foreground">{t('funeral.streakDays')}</p>
                 </div>
               </div>
 
@@ -105,7 +107,7 @@ export function TaskFuneral({ task, onClose }: Props) {
                 onClick={() => setPhase('destroy')}
                 className="w-full py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-500 transition-colors"
               >
-                🔥 火化任务
+                {t('funeral.cremate')}
               </button>
             </div>
           </motion.div>
@@ -160,7 +162,7 @@ export function TaskFuneral({ task, onClose }: Props) {
               transition={{ delay: 2 }}
               onAnimationComplete={() => setTimeout(() => setPhase('done'), 1500)}
             >
-              <p className="text-2xl font-black text-red-400">任务已粉碎！</p>
+              <p className="text-2xl font-black text-red-400">{t('funeral.shredded')}</p>
             </motion.div>
           </motion.div>
         )}
@@ -174,16 +176,16 @@ export function TaskFuneral({ task, onClose }: Props) {
           >
             <PartyPopper className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
             <h2 className="text-2xl font-black text-emerald-400 mb-2">
-              彻底解放！
+              {t('funeral.liberated')}
             </h2>
             <p className="text-muted-foreground text-sm mb-6">
-              「{task.name}」已经从你的待办清单上消失了 🎉
+              「{task.name}」{t('funeral.removedFromList')}
             </p>
             <button
               onClick={onClose}
               className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:opacity-90 transition-opacity"
             >
-              继续前进
+              {t('funeral.continue')}
             </button>
           </motion.div>
         )}
